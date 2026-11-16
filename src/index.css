@@ -1,0 +1,248 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream font-body text-ink antialiased;
+  background-image:
+    radial-gradient(circle at 12% 10%, rgba(216, 247, 228, 0.85) 0, transparent 32%),
+    radial-gradient(circle at 88% 4%, rgba(255, 233, 168, 0.5) 0, transparent 26%),
+    radial-gradient(circle at 50% 100%, rgba(205, 186, 249, 0.22) 0, transparent 45%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background: #ffc93c;
+  color: #123b2a;
+}
+
+:focus-visible {
+  outline: 3px solid #8266e6;
+  outline-offset: 2px;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+/* ------------------------------ patterns ------------------------------ */
+
+.bg-dots {
+  background-image: radial-gradient(rgba(18, 59, 42, 0.13) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(18, 59, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 59, 42, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.paper-grain {
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.9) 0.6px, transparent 0.6px),
+    radial-gradient(rgba(18, 59, 42, 0.05) 0.6px, transparent 0.6px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 4px 5px;
+}
+
+.mask-fade-x {
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ------------------------------- editor ------------------------------- */
+
+.pipi-editor textarea {
+  outline: none !important;
+  caret-color: #ffc93c;
+  overflow: hidden;
+}
+
+.pipi-editor textarea::placeholder {
+  color: rgba(201, 245, 216, 0.35);
+}
+
+.pipi-editor pre {
+  overflow: visible !important;
+}
+
+/* Prism python tokens (dark editor) */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #7fae93;
+  font-style: italic;
+}
+.token.punctuation {
+  color: #b9d8c9;
+}
+.token.namespace {
+  opacity: 0.8;
+}
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #ff9cb6;
+}
+.token.boolean,
+.token.number {
+  color: #ffd86b;
+}
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #a9f5c3;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  color: #cdbaf9;
+}
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+  color: #8ed8ff;
+}
+.token.keyword {
+  color: #ff9cb6;
+  font-weight: 600;
+}
+.token.regex,
+.token.important {
+  color: #ffc93c;
+}
+.token.important,
+.token.bold {
+  font-weight: 700;
+}
+.token.italic {
+  font-style: italic;
+}
+
+/* ----------------------------- animations ----------------------------- */
+
+.confetti-piece {
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.18, 0.7, 0.4, 1);
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -10px, 0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.progress-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.45) 45%, transparent 70%);
+  transform: translateX(-100%);
+  animation: progress-sheen 2.8s ease-in-out infinite;
+}
+
+@keyframes progress-sheen {
+  0%,
+  55% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-delay-1 {
+  animation-delay: 0.12s;
+}
+.animate-delay-2 {
+  animation-delay: 0.24s;
+}
+.animate-delay-3 {
+  animation-delay: 0.36s;
+}
+.animate-delay-4 {
+  animation-delay: 0.48s;
+}
+
+.no-motion *,
+.no-motion *::before,
+.no-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ----------------------------- scrollbars ----------------------------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(18, 59, 42, 0.28) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(18, 59, 42, 0.24);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(18, 59, 42, 0.4);
+  background-clip: content-box;
+}
