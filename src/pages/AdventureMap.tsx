@@ -24,8 +24,8 @@ export default function AdventureMap() {
         )}
       </PageHeader>
 
-      <Card tone="mint" className="relative mb-6 overflow-hidden p-4 sm:p-5">
-        <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/40" />
+      <Card tone="paper" className="relative mb-6 overflow-hidden p-4 sm:p-5">
+        <div className="absolute inset-y-0 left-0 w-2 bg-sun" aria-hidden="true" />
         <div className="relative grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -44,13 +44,13 @@ export default function AdventureMap() {
               <ProgressBar value={overall.percent} height={12} showLabel label="Progres keseluruhan" />
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] font-extrabold text-ink/45">
-              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-ink bg-white" /> Terbuka</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-ink bg-surface" /> Terbuka</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-ink bg-leaf" /> Tuntas</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border-2 border-ink bg-ink/20" /> Terkunci</span>
             </div>
           </div>
           <div className="hidden sm:block">
-            <Pipi mood="hint" size={130} stage={next ? 'baby' : 'master'} sparkle />
+            <Pipi mood="hint" size={130} stage={next ? 'baby' : 'master'} />
           </div>
         </div>
       </Card>
@@ -66,17 +66,17 @@ export default function AdventureMap() {
             const card = (
               <div
                 className={cn(
-                  'relative w-full overflow-hidden rounded-[26px] border-[3px] border-ink p-4 shadow-pop transition',
-                  p.unlocked ? 'bg-paper' : 'bg-[#F2F1EA]',
+                  'relative w-full overflow-hidden rounded-xl border-2 border-ink p-4 shadow-pop transition',
+                  p.unlocked ? 'bg-paper' : 'bg-ink/10',
                   p.unlocked && 'hover:shadow-pop-lg',
-                  isCurrent && 'ring-4 ring-sun/70',
+                  isCurrent && 'ring-2 ring-sun',
                 )}
               >
                 <div
                   className="absolute inset-x-0 top-0 h-1.5"
-                  style={{ background: `linear-gradient(90deg, ${world.palette.accent}, ${world.palette.from})` }}
+                  style={{ backgroundColor: world.palette.accent }}
                 />
-                {!p.unlocked && <div className="absolute inset-0 z-10 bg-[#F2F1EA]/70 backdrop-blur-[1px]" />}
+                {!p.unlocked && <div className="absolute inset-0 z-10 bg-ink/10/70 backdrop-blur-[1px]" />}
                 <div className="relative flex items-start gap-3">
                   <span
                     className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-ink"
@@ -108,7 +108,7 @@ export default function AdventureMap() {
                             done
                               ? 'border-leaf bg-leaf/15 text-leafDark'
                               : open && p.unlocked
-                                ? 'border-ink/20 bg-white text-ink/60'
+                                ? 'border-ink/20 bg-surface text-ink/60'
                                 : 'border-ink/10 bg-ink/5 text-ink/30',
                           )}
                           title={level.title}
@@ -124,7 +124,7 @@ export default function AdventureMap() {
 
                 <div className="relative mt-3 flex flex-wrap items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-lg bg-ink/5 px-2 py-1 text-[10px] font-bold text-ink/55">
-                    <Icon name="sword" size={12} className={p.bossDefeated ? 'text-leafDark' : 'text-coral'} />
+                    <Icon name="sword" size={12} className={p.bossDefeated ? 'text-leafDark' : 'text-coral-text'} />
                     {p.bossDefeated ? `${world.boss.name} dikalahkan` : `${world.boss.name} • ${world.boss.hp} HP`}
                   </span>
                   <span className="inline-flex items-center gap-2 text-[10px] font-extrabold text-ink/45">
@@ -135,7 +135,7 @@ export default function AdventureMap() {
 
                 <div className="relative mt-3 flex flex-wrap gap-1.5">
                   {!p.unlocked ? (
-                    <div className="flex items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-white/70 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
+                    <div className="flex items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-surface/70 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
                       <Icon name="lock" size={12} />
                       Kalahkan {prev?.boss.name ?? 'boss sebelumnya'} untuk membuka dunia ini.
                     </div>
@@ -167,7 +167,7 @@ export default function AdventureMap() {
                 <div
                   className={cn(
                     'absolute left-5 top-1/2 z-0 grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-[3px] border-ink font-display text-[11px] font-extrabold md:left-1/2',
-                    p.bossDefeated ? 'bg-leaf text-white' : p.unlocked ? 'bg-sun text-ink' : 'bg-[#DDE1D9] text-ink/45',
+                    p.bossDefeated ? 'bg-leaf text-white' : p.unlocked ? 'bg-sun text-ink' : 'bg-ink/15 text-ink/45',
                   )}
                   aria-hidden="true"
                 >

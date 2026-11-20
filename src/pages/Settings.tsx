@@ -4,6 +4,7 @@ import { useGame } from '../store/GameContext'
 import { downloadSave } from '../lib/storage'
 import { getPythonEngineStatus, pythonRunner } from '../lib/python'
 import { todayKey } from '../lib/game'
+import { usePreferences } from '../lib/preferences'
 import { Pipi } from '../components/Pipi'
 import { Icon } from '../components/Icon'
 import { Button, Card, Chip, Modal, PageHeader, ProgressBar, SectionHeading, cn } from '../components/ui'
@@ -24,7 +25,7 @@ function ToggleRow({
   note?: string
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border-2 border-ink/10 bg-white/60 p-3">
+    <div className="flex items-start gap-3 rounded-2xl border-2 border-ink/10 bg-surface/60 p-3">
       <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-ink', checked ? 'bg-mint' : 'bg-ink/5')}>
         <Icon name={icon} size={16} />
       </span>
@@ -39,13 +40,13 @@ function ToggleRow({
         aria-label={title}
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative mt-1 h-6 w-11 shrink-0 rounded-full border-2 border-ink transition',
+          "relative mt-1 h-6 w-11 shrink-0 rounded-full border-2 border-ink transition before:absolute before:-inset-2.5 before:content-['']",
           checked ? 'bg-leaf' : 'bg-ink/15',
         )}
       >
         <span
           className={cn(
-            'absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-ink bg-white transition-all',
+            'absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border-2 border-ink bg-surface transition-all',
             checked ? 'left-[22px]' : 'left-[3px]',
           )}
         />
@@ -56,6 +57,7 @@ function ToggleRow({
 
 export default function Settings() {
   const { save, updateSettings, resetProgress, importSaveText, notify } = useGame()
+  const { theme, fontSize, setTheme, setFontSize } = usePreferences()
   const [resetOpen, setResetOpen] = useState(false)
   const [resetPhrase, setResetPhrase] = useState('')
   const [engine, setEngine] = useState(getPythonEngineStatus)
@@ -107,6 +109,71 @@ export default function Settings() {
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4">
           <Card className="p-4">
+            <SectionHeading
+              eyebrow="Penampilan"
+              title="Tema & ukuran teks"
+              subtitle="Warna hangat tetap terasa nyaman di mode terang maupun gelap."
+              className="mb-3"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <div className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wide text-ink/55">Mode warna</div>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-label="Pilih mode warna">
+                  {[
+                    { id: 'light' as const, label: 'Terang', icon: 'sun', preview: 'bg-[#FFF9E9] text-[#123B2A]' },
+                    { id: 'dark' as const, label: 'Gelap', icon: 'moon', preview: 'bg-[#081C14] text-[#E9FFF1]' },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      aria-pressed={theme === option.id}
+                      onClick={() => setTheme(option.id)}
+                      className={cn(
+                        'flex min-h-12 items-center gap-2 rounded-xl border-2 px-3 py-2 text-left font-display text-xs font-extrabold transition',
+                        theme === option.id
+                          ? 'border-ink bg-sun shadow-pop-sm'
+                          : 'border-ink/15 bg-surface/60 hover:border-ink/40 hover:bg-surface',
+                      )}
+                    >
+                      <span className={cn('grid h-7 w-7 place-items-center rounded-lg border-2 border-ink', option.preview)}>
+                        <Icon name={option.icon} size={14} />
+                      </span>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wide text-ink/55">Ukuran teks</div>
+                <div className="grid grid-cols-3 gap-2" role="group" aria-label="Pilih ukuran teks">
+                  {[
+                    { id: 'normal' as const, label: 'Normal' },
+                    { id: 'large' as const, label: 'Besar' },
+                    { id: 'xlarge' as const, label: 'XL' },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      aria-pressed={fontSize === option.id}
+                      onClick={() => setFontSize(option.id)}
+                      className={cn(
+                        'min-h-12 rounded-xl border-2 px-2 py-2 font-display font-extrabold transition',
+                        fontSize === option.id
+                          ? 'border-ink bg-sun shadow-pop-sm'
+                          : 'border-ink/15 bg-surface/60 text-ink/65 hover:border-ink/40 hover:bg-surface',
+                        option.id === 'large' && 'text-sm',
+                        option.id === 'xlarge' && 'text-base',
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
             <SectionHeading eyebrow="Preferensi" title="Pengalaman belajar" subtitle="Perubahan langsung diterapkan dan disimpan." className="mb-3" />
             <div className="space-y-2">
               <ToggleRow
@@ -144,7 +211,7 @@ export default function Settings() {
 
           <Card className="p-4">
             <SectionHeading eyebrow="Mesin Python" title="Status Pyodide" subtitle="Python berjalan di browser melalui WebAssembly. Tidak ada kode yang dikirim ke server." className="mb-3" />
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-ink/10 bg-white/60 p-3">
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-ink/10 bg-surface/60 p-3">
               <span className={cn('grid h-11 w-11 place-items-center rounded-xl border-[3px] border-ink', engine.ready ? 'bg-leaf text-white' : engine.loading ? 'bg-sun' : 'bg-ink/10')}>
                 <Icon name={engine.ready ? 'check' : engine.loading ? 'refresh-cw' : 'terminal'} size={20} className={engine.loading ? 'animate-spin' : ''} />
               </span>
@@ -175,20 +242,20 @@ export default function Settings() {
               <Button size="sm" variant="secondary" icon="upload" onClick={() => fileRef.current?.click()}>Impor save</Button>
               <Link to="/profile"><Button size="sm" variant="ghost" icon="user">Kelola profil</Button></Link>
             </div>
-            <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => void importData(e.target.files?.[0])} />
+            <input ref={fileRef} type="file" accept="application/json,.json" aria-label="Pilih file cadangan JSON" className="hidden" onChange={(e) => void importData(e.target.files?.[0])} />
             <p className="mt-2 text-[10px] font-semibold text-ink/40">
               Import akan menggantikan data profil yang sedang aktif. Ekspor dulu jika ingin menyimpan kondisi sekarang.
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <div className="rounded-xl border-2 border-ink/10 bg-white/60 px-2 py-1.5">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/60 px-2 py-1.5">
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">Profil</div>
                 <div className="truncate text-[11px] font-extrabold">{save.profile.name}</div>
               </div>
-              <div className="rounded-xl border-2 border-ink/10 bg-white/60 px-2 py-1.5">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/60 px-2 py-1.5">
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">Mini game berhadiah hari ini</div>
                 <div className="text-[11px] font-extrabold">{rewardedToday}/12 ronde</div>
               </div>
-              <div className="rounded-xl border-2 border-ink/10 bg-white/60 px-2 py-1.5">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/60 px-2 py-1.5">
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">Versi save</div>
                 <div className="text-[11px] font-extrabold">v{save.version}</div>
               </div>
@@ -218,19 +285,19 @@ export default function Settings() {
               <h3 className="font-display text-sm font-extrabold">Pintasan</h3>
             </div>
             <div className="mt-2 space-y-1.5 text-[10px] font-semibold text-ink/55">
-              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-white/60 px-2 py-1">
+              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-surface/60 px-2 py-1">
                 <span>Jalankan kode di Playground</span>
-                <kbd className="rounded border border-ink/20 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold">Ctrl</kbd>
+                <kbd className="rounded border border-ink/20 bg-surface px-1.5 py-0.5 font-mono text-[9px] font-bold">Ctrl</kbd>
                 <span>+</span>
-                <kbd className="rounded border border-ink/20 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold">Enter</kbd>
+                <kbd className="rounded border border-ink/20 bg-surface px-1.5 py-0.5 font-mono text-[9px] font-bold">Enter</kbd>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-white/60 px-2 py-1">
+              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-surface/60 px-2 py-1">
                 <span>Kirim pesan di tutor</span>
-                <kbd className="rounded border border-ink/20 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold">Enter</kbd>
+                <kbd className="rounded border border-ink/20 bg-surface px-1.5 py-0.5 font-mono text-[9px] font-bold">Enter</kbd>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-white/60 px-2 py-1">
+              <div className="flex items-center justify-between rounded-lg border border-ink/10 bg-surface/60 px-2 py-1">
                 <span>Baris baru di tutor</span>
-                <kbd className="rounded border border-ink/20 bg-white px-1.5 py-0.5 font-mono text-[9px] font-bold">Shift + Enter</kbd>
+                <kbd className="rounded border border-ink/20 bg-surface px-1.5 py-0.5 font-mono text-[9px] font-bold">Shift + Enter</kbd>
               </div>
             </div>
           </Card>
@@ -266,7 +333,7 @@ export default function Settings() {
             </ul>
           </Card>
 
-          <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-white/40 p-3 text-center">
+          <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-surface/40 p-3 text-center">
             <Pipi mood="happy" size={70} className="mx-auto" />
             <p className="mt-1 text-[10px] font-semibold leading-snug text-ink/45">
               Dibangun untuk belajar Python dengan santai, jujur, dan menyenangkan.
@@ -296,12 +363,12 @@ export default function Settings() {
         </p>
         <label className="mt-3 block">
           <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-ink/40">
-            Ketik <span className="font-mono text-coral">reset</span> untuk mengonfirmasi
+            Ketik <span className="font-mono text-coral-text">reset</span> untuk mengonfirmasi
           </span>
           <input
             value={resetPhrase}
             onChange={(e) => setResetPhrase(e.target.value)}
-            className="w-full rounded-xl border-2 border-ink/20 bg-white px-3 py-2 font-mono text-sm font-bold outline-none focus:border-coral"
+            className="w-full rounded-xl border-2 border-ink/20 bg-surface px-3 py-2 font-mono text-sm font-bold outline-none focus:border-coral"
             placeholder="reset"
             aria-label="Ketik reset untuk konfirmasi"
           />

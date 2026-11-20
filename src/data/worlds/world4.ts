@@ -12,7 +12,7 @@ export const world4: World = {
   description:
     'Pelajari for loop, while loop, range(), break, dan continue untuk mengulang pekerjaan dengan cerdas.',
   icon: 'repeat',
-  palette: { from: '#3ECF8E', to: '#167A4B', accent: '#FFC93C', soft: '#DDF8EC' },
+  palette: { from: '#5FB3DE', to: '#2C6FA8', accent: '#F5B53C', soft: '#DDEEF9' },
   reward: { xp: 170, coins: 85, badge: 'loop-master' },
   levels: [
     {

@@ -9,19 +9,19 @@ type ButtonVariant = 'primary' | 'secondary' | 'sun' | 'grape' | 'danger' | 'gho
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-leaf text-white hover:bg-leafDark',
-  secondary: 'bg-paper text-ink hover:bg-mint',
-  sun: 'bg-sun text-ink hover:bg-[#FFD86B]',
-  grape: 'bg-grape text-ink hover:bg-[#B9A2F5]',
-  danger: 'bg-coral text-ink hover:bg-[#FF7562]',
-  ghost: 'bg-white/60 text-ink border-transparent shadow-none hover:bg-white',
-  outline: 'bg-transparent text-ink hover:bg-mint/60',
+  primary: 'bg-primary text-primary-ink hover:bg-leafDark',
+  secondary: 'bg-surface text-ink hover:bg-cream',
+  sun: 'bg-sun text-ink hover:bg-[#e8a72f]',
+  grape: 'bg-grape text-ink hover:bg-[#c7b5df]',
+  danger: 'bg-coral text-white hover:bg-[#d5553b]',
+  ghost: 'bg-transparent text-ink border-transparent shadow-none hover:bg-ink/5',
+  outline: 'bg-transparent text-ink hover:bg-cream',
 }
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-xs rounded-xl gap-1.5 border-2',
-  md: 'px-4 py-2.5 text-sm rounded-2xl gap-2',
-  lg: 'px-6 py-3.5 text-base rounded-2xl gap-2.5',
+  sm: 'min-h-11 px-3 py-1.5 text-xs rounded-lg gap-1.5 border-2',
+  md: 'min-h-11 px-4 py-2.5 text-sm rounded-lg gap-2',
+  lg: 'min-h-12 px-6 py-3.5 text-base rounded-xl gap-2.5',
 }
 
 export function Button({
@@ -41,7 +41,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex select-none items-center justify-center border-[3px] border-ink font-display font-bold shadow-pop transition-all duration-150 active:translate-y-[3px] active:shadow-pop-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0 disabled:active:shadow-pop',
+        'inline-flex select-none items-center justify-center border-2 border-ink font-display font-bold shadow-pop-sm transition-all duration-150 hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0',
         VARIANTS[variant],
         SIZES[size],
         variant === 'ghost' && 'border-transparent',
@@ -68,17 +68,17 @@ export function Card({
   hover?: boolean
 }) {
   const tones = {
-    paper: 'bg-paper',
+    paper: 'bg-surface',
     mint: 'bg-mint',
     cream: 'bg-cream',
-    grape: 'bg-[#F0EAFF]',
-    sun: 'bg-[#FFF4CC]',
-    white: 'bg-white',
+    grape: 'bg-grape-soft',
+    sun: 'bg-warning-soft',
+    white: 'bg-surface',
   }
   return (
     <div
       className={cn(
-        'rounded-[26px] border-[3px] border-ink shadow-pop',
+        'rounded-xl border-2 border-ink shadow-pop',
         tones[tone],
         hover && 'transition-transform duration-200 hover:-translate-y-1 hover:shadow-pop-lg',
         className,
@@ -116,7 +116,7 @@ export function ProgressBar({
         </div>
       )}
       <div
-        className="relative w-full overflow-hidden rounded-full border-2 border-ink/20 bg-[#E7F3E9]"
+        className="relative w-full overflow-hidden rounded-full border-2 border-ink/20 bg-ink/10"
         style={{ height }}
         role="progressbar"
         aria-valuenow={Math.round(pct)}
@@ -136,7 +136,7 @@ export function ProgressBar({
 export function Chip({
   children,
   icon,
-  color = '#123B2A',
+  color,
   className,
 }: {
   children: ReactNode
@@ -147,10 +147,10 @@ export function Chip({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border-2 border-ink/15 bg-white/80 px-2.5 py-1 text-[11px] font-extrabold text-ink',
+        'inline-flex items-center gap-1.5 rounded-md border-2 border-ink/15 bg-surface/80 px-2.5 py-1 text-[11px] font-extrabold text-ink',
         className,
       )}
-      style={{ color }}
+      style={color ? { color: `color-mix(in srgb, ${color} 68%, rgb(var(--c-ink)))` } : undefined}
     >
       {icon && <Icon name={icon} size={13} />}
       {children}
@@ -175,12 +175,12 @@ export function SectionHeading({
     <div className={cn('mb-4 flex flex-wrap items-end justify-between gap-3', className)}>
       <div>
         {eyebrow && (
-          <div className="mb-1 flex items-center gap-2 font-display text-[11px] font-bold uppercase tracking-[0.18em] text-leafDark">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-leaf" />
+          <div className="mb-1 flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-leafDark">
+            <span className="inline-block h-2 w-2 border border-ink bg-sun" />
             {eyebrow}
           </div>
         )}
-        <h2 className="font-display text-xl font-extrabold leading-tight text-ink sm:text-2xl">{title}</h2>
+        <h2 className="text-gradient font-display text-xl font-extrabold leading-tight sm:text-2xl">{title}</h2>
         {subtitle && <p className="mt-1 max-w-2xl text-sm font-semibold text-ink/60">{subtitle}</p>}
       </div>
       {action}
@@ -203,12 +203,12 @@ export function PageHeader({
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border-[3px] border-ink bg-sun shadow-pop-sm">
-            <Icon name={icon} size={24} />
+          <div className="group grid h-12 w-12 -rotate-2 place-items-center rounded-lg border-2 border-ink bg-sun shadow-pop-sm transition-transform duration-200 hover:rotate-0">
+            <Icon name={icon} size={23} />
           </div>
         )}
         <div>
-          <h1 className="font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">{title}</h1>
+          <h1 className="text-gradient font-display text-2xl font-extrabold leading-tight sm:text-3xl">{title}</h1>
           {subtitle && <p className="mt-1 text-sm font-semibold text-ink/60">{subtitle}</p>}
         </div>
       </div>
@@ -254,36 +254,36 @@ export function Modal({
 
   if (!open) return null
   const widths = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }
-  const tones = { paper: 'bg-paper', cream: 'bg-cream', mint: 'bg-mint', white: 'bg-white' }
+  const tones = { paper: 'bg-paper', cream: 'bg-cream', mint: 'bg-mint', white: 'bg-surface' }
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6" role="dialog" aria-modal="true">
       <button
-        className="absolute inset-0 cursor-default bg-ink/45 backdrop-blur-sm"
+        className="absolute inset-0 cursor-default bg-ink/55"
         onClick={onClose}
         aria-label="Tutup dialog"
         tabIndex={-1}
       />
       <div
         className={cn(
-          'relative z-10 w-full animate-pop-in overflow-hidden rounded-[28px] border-[3px] border-ink shadow-pop-lg',
+          'relative z-10 w-full animate-pop-in overflow-hidden rounded-xl border-2 border-ink shadow-pop-lg',
           widths[size],
           tones[tone],
         )}
       >
         {(title || !hideClose) && (
-          <div className="flex items-center justify-between gap-3 border-b-[3px] border-ink/10 px-5 py-4">
+          <div className="flex items-center justify-between gap-3 border-b-2 border-ink/15 px-5 py-4">
             <div className="flex items-center gap-2">
               {icon && (
-                <div className="grid h-9 w-9 place-items-center rounded-xl border-2 border-ink bg-sun">
+                <div className="grid h-9 w-9 -rotate-2 place-items-center rounded-md border-2 border-ink bg-sun">
                   <Icon name={icon} size={18} />
                 </div>
               )}
-              {title && <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>}
+              {title && <h3 className="font-display text-lg font-bold text-ink">{title}</h3>}
             </div>
             {!hideClose && (
               <button
                 onClick={onClose}
-                className="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-white text-ink transition hover:bg-rose"
+                className="grid h-9 w-9 place-items-center rounded-md border-2 border-ink bg-surface text-ink transition hover:bg-rose"
                 aria-label="Tutup"
               >
                 <Icon name="x" size={17} />
@@ -292,7 +292,7 @@ export function Modal({
           </div>
         )}
         <div className="max-h-[72vh] overflow-y-auto px-5 py-5">{children}</div>
-        {footer && <div className="border-t-[3px] border-ink/10 bg-white/40 px-5 py-4">{footer}</div>}
+        {footer && <div className="border-t-2 border-ink/15 bg-surface/50 px-5 py-4">{footer}</div>}
       </div>
     </div>
   )
@@ -310,8 +310,8 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-[24px] border-[3px] border-dashed border-ink/25 bg-white/50 px-6 py-10 text-center">
-      <div className="mb-3 grid h-14 w-14 place-items-center rounded-2xl border-[3px] border-ink/20 bg-mint text-ink/70">
+    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-ink/25 bg-surface/50 px-6 py-10 text-center">
+      <div className="mb-3 grid h-14 w-14 place-items-center rounded-lg border-2 border-ink/20 bg-mint text-ink/70">
         <Icon name={icon} size={26} />
       </div>
       <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>
@@ -337,9 +337,9 @@ export function StatTile({
   className?: string
 }) {
   return (
-    <div className={cn('flex items-center gap-3 rounded-2xl border-[3px] border-ink bg-white/80 p-3', className)}>
+    <div className={cn('flex items-center gap-3 rounded-lg border-2 border-ink bg-surface p-3 shadow-pop-sm', className)}>
       <div
-        className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-ink"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-md border-2 border-ink"
         style={{ backgroundColor: color }}
       >
         <Icon name={icon} size={19} />

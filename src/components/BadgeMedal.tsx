@@ -48,15 +48,15 @@ export function BadgeMedal({
             : 'radial-gradient(circle at 35% 28%, #FAFAF7 0%, #DDE5DF 70%)',
         }}
       >
-        <div className="absolute inset-[9px] rounded-full border-2 border-ink/15 bg-white/45" />
-        <div className="relative grid h-[58%] w-[58%] place-items-center rounded-full border-2 border-ink/20 bg-white/85 text-ink">
+        <div className="absolute inset-[9px] rounded-full border-2 border-ink/15 bg-surface/45" />
+        <div className="relative grid h-[58%] w-[58%] place-items-center rounded-full border-2 border-ink/20 bg-surface/85 text-ink">
           <Icon name={badge.icon} size={size * 0.32} strokeWidth={2.6} />
         </div>
-        <span className="absolute left-[18%] top-[12%] h-2 w-2 rounded-full bg-white/90" />
-        <span className="absolute right-[16%] top-[24%] h-1.5 w-1.5 rounded-full bg-white/70" />
+        <span className="absolute left-[18%] top-[12%] h-2 w-2 rounded-full bg-surface/90" />
+        <span className="absolute right-[16%] top-[24%] h-1.5 w-1.5 rounded-full bg-surface/70" />
       </div>
       {!unlocked && showLock && (
-        <span className="absolute right-0 top-0 grid h-6 w-6 place-items-center rounded-full border-2 border-ink bg-white text-ink">
+        <span className="absolute right-0 top-0 grid h-6 w-6 place-items-center rounded-full border-2 border-ink bg-surface text-ink">
           <Icon name="lock" size={12} />
         </span>
       )}

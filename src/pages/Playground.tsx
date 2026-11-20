@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { useGame } from '../store/GameContext'
 import { PLAYGROUND_TEMPLATES } from '../data/playground'
-import { getPythonEngineStatus, pythonRunner, runPython, type RunResult } from '../lib/python'
+import { friendlyPythonError, getPythonEngineStatus, pythonRunner, runPython, type RunResult } from '../lib/python'
 import { sound } from '../lib/sound'
 import { CodeEditor } from '../components/CodeEditor'
 import { Pipi, PipiBubble } from '../components/Pipi'
@@ -107,6 +107,7 @@ export default function Playground() {
 
   const statusColor = result ? (result.ok ? '#2FBF71' : '#FF8A7A') : running ? '#FFC93C' : '#6B8577'
   const statusText = running ? 'Menjalankan...' : result ? (result.ok ? 'Selesai tanpa error' : result.timedOut ? 'Dihentikan: timeout' : 'Error') : 'Siap menerima kode'
+  const friendly = result?.error ? friendlyPythonError(result.error) : null
 
   return (
     <div>
@@ -115,7 +116,7 @@ export default function Playground() {
           <span
             className={cn(
               'inline-flex items-center gap-1.5 rounded-full border-2 px-2.5 py-1 text-[10px] font-extrabold',
-              engine === 'ready' ? 'border-leaf/40 bg-[#F3FFF7] text-leafDark' : engine === 'offline' ? 'border-coral/40 bg-[#FFF3F0] text-[#B3341F]' : 'border-sun/60 bg-[#FFF8DF] text-ink/60',
+              engine === 'ready' ? 'border-leaf/40 bg-success-soft text-leafDark' : engine === 'offline' ? 'border-coral/40 bg-danger-soft text-danger' : 'border-sun/60 bg-warning-soft text-ink/60',
             )}
           >
             <span className={cn('h-2 w-2 rounded-full', engine === 'ready' ? 'bg-leaf animate-pulse' : engine === 'offline' ? 'bg-coral' : 'bg-sun animate-pulse')} />
@@ -136,11 +137,11 @@ export default function Playground() {
             onClick={() => selectTemplate(t.id)}
             className={cn(
               'flex w-[168px] shrink-0 items-center gap-2 rounded-xl border-[3px] px-2.5 py-2 text-left transition',
-              templateId === t.id ? 'border-ink bg-sun shadow-pop-sm' : 'border-ink/10 bg-white/60 hover:border-ink/25 hover:bg-white',
+              templateId === t.id ? 'border-ink bg-sun shadow-pop-sm' : 'border-ink/10 bg-surface/60 hover:border-ink/25 hover:bg-surface',
             )}
             aria-pressed={templateId === t.id}
           >
-            <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg border-2', templateId === t.id ? 'border-ink bg-white/60' : 'border-ink/15 bg-cream')}>
+            <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg border-2', templateId === t.id ? 'border-ink bg-surface/60' : 'border-ink/15 bg-cream')}>
               <Icon name={t.icon} size={13} />
             </span>
             <span className="min-w-0">
@@ -151,18 +152,18 @@ export default function Playground() {
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-1.5">
               <Chip icon="file">{template.name}</Chip>
               <span className="text-[10px] font-bold text-ink/35">Tersimpan otomatis</span>
             </div>
             <div className="flex gap-1">
-              <button onClick={copy} className="inline-flex items-center gap-1 rounded-lg border-2 border-ink/10 bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55 hover:border-ink/25">
+              <button onClick={copy} className="inline-flex min-h-11 items-center gap-1 rounded-lg border-2 border-ink/10 bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55 hover:border-ink/25">
                 <Icon name={copied ? 'check' : 'copy'} size={11} /> {copied ? 'Tersalin' : 'Salin'}
               </button>
-              <button onClick={reset} className="inline-flex items-center gap-1 rounded-lg border-2 border-ink/10 bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55 hover:border-ink/25">
+              <button onClick={reset} className="inline-flex min-h-11 items-center gap-1 rounded-lg border-2 border-ink/10 bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55 hover:border-ink/25">
                 <Icon name="refresh-cw" size={11} /> Reset contoh
               </button>
             </div>
@@ -178,7 +179,7 @@ export default function Playground() {
             />
           </div>
 
-          <div className="rounded-xl border-2 border-ink/10 bg-white/60 p-2">
+          <div className="rounded-xl border-2 border-ink/10 bg-surface/60 p-2">
             <label htmlFor="stdin" className="mb-1 flex items-center gap-1 text-[9px] font-extrabold uppercase tracking-wide text-ink/40">
               <Icon name="corner-down-left" size={11} /> Input (stdin) untuk input()
             </label>
@@ -187,7 +188,7 @@ export default function Playground() {
               value={stdin}
               onChange={(e) => setStdin(e.target.value)}
               placeholder="Contoh: Pipi&#10;12"
-              className="w-full rounded-lg border-2 border-ink/10 bg-white px-2 py-1.5 font-mono text-[11px] text-ink/75 outline-none placeholder:text-ink/25 focus:border-grape"
+              className="w-full rounded-lg border-2 border-ink/10 bg-surface px-2 py-1.5 font-mono text-[11px] text-ink/75 outline-none placeholder:text-ink/25 focus:border-grape"
             />
           </div>
 
@@ -200,17 +201,17 @@ export default function Playground() {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="overflow-hidden rounded-2xl border-[3px] border-ink bg-[#0F2B20] shadow-pop">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-[#14382A] px-3 py-2">
+        <div className="min-w-0 space-y-3">
+          <div className="overflow-hidden rounded-2xl border-[3px] border-ink bg-code shadow-pop">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-code-header px-3 py-2">
               <div className="flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: statusColor }} />
-                <span className="font-mono text-[11px] font-semibold text-mint/70">console</span>
-                <span className="font-mono text-[10px] text-mint/40">{statusText}</span>
+                <span className="font-mono text-[11px] font-semibold text-code-ink/70">console</span>
+                <span className="font-mono text-[10px] text-code-ink/40">{statusText}</span>
               </div>
               <div className="flex items-center gap-2">
-                {result && <span className="font-mono text-[10px] text-mint/40">{Math.round(result.durationMs)} ms</span>}
-                <button onClick={() => setResult(null)} className="rounded-md border border-white/15 px-1.5 py-0.5 text-[9px] font-bold text-mint/60 hover:bg-white/10">
+                {result && <span className="font-mono text-[10px] text-code-ink/40">{Math.round(result.durationMs)} ms</span>}
+                <button onClick={() => setResult(null)} className="min-h-11 rounded-md border border-white/15 px-2 py-0.5 text-[9px] font-bold text-code-ink/60 hover:bg-white/10 sm:min-h-0">
                   Bersihkan
                 </button>
               </div>
@@ -219,9 +220,9 @@ export default function Playground() {
               {running ? (
                 <div className="flex h-full min-h-[300px] flex-col items-center justify-center text-center">
                   <div className="animate-bob"><Pipi mood="thinking" size={92} /></div>
-                  <p className="mt-2 text-[11px] font-bold text-mint/60">Python sedang bekerja...</p>
+                  <p className="mt-2 text-[11px] font-bold text-code-ink/60">Python sedang bekerja...</p>
                   {engine !== 'ready' && (
-                    <p className="mt-1 max-w-xs text-[10px] font-semibold text-mint/35">
+                    <p className="mt-1 max-w-xs text-[10px] font-semibold text-code-ink/35">
                       Kunjungan pertama perlu mengunduh mesin Pyodide (beberapa MB). Setelah itu lebih cepat.
                     </p>
                   )}
@@ -231,20 +232,29 @@ export default function Playground() {
                   {result.output && (
                     <pre className="whitespace-pre-wrap break-words text-[#B9F5CE]">{result.output}</pre>
                   )}
+                  {result.error && friendly && !result.timedOut && (
+                    <div className="mt-2 rounded-xl border border-[#FFB3A8]/30 bg-[#FF8A7A]/10 px-2.5 py-2">
+                      <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-[#FFB3A8]">
+                        <Icon name="alert" size={12} />
+                        {friendly.title}{friendly.line ? ` · baris ${friendly.line}` : ''}
+                      </div>
+                      <p className="mt-1 text-[10px] font-semibold leading-relaxed text-code-ink/65">{friendly.hint}</p>
+                    </div>
+                  )}
                   {result.error && (
                     <pre className="mt-2 whitespace-pre-wrap break-words text-[#FFB3A8]">
                       {result.timedOut ? result.error : result.error.trim().split('\n').slice(-12).join('\n')}
                     </pre>
                   )}
                   {!result.output && !result.error && (
-                    <p className="text-[11px] font-semibold italic text-mint/35">(Program selesai tanpa output. Tambahkan print() untuk melihat hasil.)</p>
+                    <p className="text-[11px] font-semibold italic text-code-ink/35">(Program selesai tanpa output. Tambahkan print() untuk melihat hasil.)</p>
                   )}
                 </div>
               ) : (
                 <div className="flex h-full min-h-[300px] flex-col items-center justify-center text-center">
-                  <Icon name="terminal" size={34} className="text-mint/25" />
-                  <p className="mt-2 text-[11px] font-bold text-mint/40">Output akan muncul di sini.</p>
-                  <p className="mt-1 max-w-xs text-[10px] font-semibold text-mint/25">
+                  <Icon name="terminal" size={34} className="text-code-ink/25" />
+                  <p className="mt-2 text-[11px] font-bold text-code-ink/40">Output akan muncul di sini.</p>
+                  <p className="mt-1 max-w-xs text-[10px] font-semibold text-code-ink/25">
                     Tekan "Jalankan Kode". Python berjalan di perangkatmu, bukan di server.
                   </p>
                 </div>
@@ -253,8 +263,8 @@ export default function Playground() {
           </div>
 
           {result?.offline && (
-            <div className="rounded-xl border-2 border-coral/40 bg-[#FFF3F0] px-3 py-2">
-              <div className="flex items-center gap-1.5 font-display text-xs font-extrabold text-[#B3341F]">
+            <div className="rounded-xl border-2 border-coral/40 bg-danger-soft px-3 py-2">
+              <div className="flex items-center gap-1.5 font-display text-xs font-extrabold text-danger">
                 <Icon name="alert" size={13} /> Mesin Python belum siap
               </div>
               <p className="mt-0.5 text-[10px] font-semibold leading-relaxed text-ink/55">

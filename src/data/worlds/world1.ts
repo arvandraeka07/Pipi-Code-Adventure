@@ -12,7 +12,7 @@ export const world1: World = {
   description:
     'Kenalan dengan Python, pahami apa itu coding, dan tulis program pertamamu bersama Pipi.',
   icon: 'sparkles',
-  palette: { from: '#2FBF71', to: '#159A55', accent: '#FFC93C', soft: '#D8F7E4' },
+  palette: { from: '#2FAE8F', to: '#167A68', accent: '#F5B53C', soft: '#DDF3EC' },
   reward: { xp: 150, coins: 75, badge: 'python-adventurer' },
   levels: [
     {
@@ -61,12 +61,17 @@ export const world1: World = {
         starter: 'print("Halo, dunia!")\n# Tulis kode pertamamu di bawah ini\n',
       },
       challenge: {
-        prompt: 'Tampilkan teks: Halo, Pipi!',
+        prompt: 'Lengkapi bagian kosong agar program menampilkan: Halo, Pipi!',
         starter: '# Tulis kode-mu di sini\n',
         hint: 'Gunakan print() lalu tulis teks di dalam tanda kutip. Contoh: print("...")',
         solution: 'print("Halo, Pipi!")',
         check: 'output',
         expected: 'Halo, Pipi!',
+        kind: 'fill',
+        fill: {
+          template: '{{blank}}("Halo, Pipi!")',
+          blanks: [{ answer: 'print', placeholder: 'nama perintah' }],
+        },
       },
       quiz: [
         {
@@ -171,12 +176,18 @@ export const world1: World = {
         starter: 'print("Halo dari playground!")\nprint("Aku siap belajar Python.")\n',
       },
       challenge: {
-        prompt: 'Cetak dua baris berikut (persis, tanpa tanda kutip):\nAku belajar Python\nBersama Pipi',
+        prompt: 'Mini project: buat kartu perkenalan dua baris.\nCetak persis (tanpa tanda kutip):\nAku belajar Python\nBersama Pipi',
         starter: '# Cetak dua baris\n',
         hint: 'Gunakan dua perintah print(). Baris pertama dan baris kedua dipisahkan enter.',
         solution: 'print("Aku belajar Python")\nprint("Bersama Pipi")',
         check: 'output',
         expected: 'Aku belajar Python\nBersama Pipi',
+        kind: 'project',
+        requirements: [
+          'Gunakan minimal dua perintah print().',
+          'Baris pertama berisi "Aku belajar Python".',
+          'Baris kedua berisi "Bersama Pipi".',
+        ],
       },
       quiz: [
         {

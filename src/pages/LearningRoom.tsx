@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+﻿import { Fragment, useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useGame } from '../store/GameContext'
 import { findLevelById } from '../data/worlds'
@@ -6,7 +6,7 @@ import { isLevelUnlocked, nextLevelInWorld } from '../lib/progress'
 import { levelGlobalIndex } from '../data/worlds'
 import { scoreLabel } from '../lib/game'
 import type { RewardSummary } from '../types'
-import { checkChallenge, runPython, type ChallengeResult, type RunResult } from '../lib/python'
+import { checkChallenge, friendlyPythonError, runPython, type ChallengeResult, type RunResult } from '../lib/python'
 import { sound } from '../lib/sound'
 import { CodeBlock, CodeEditor } from '../components/CodeEditor'
 import { Pipi, PipiBubble } from '../components/Pipi'
@@ -57,7 +57,7 @@ function MiniLab({ starter, stdin }: { starter: string; stdin?: string }) {
           <span className="ml-auto text-[9px] font-bold text-ink/35">Python berjalan di browser-mu</span>
         </div>
         {result && (
-          <div className={cn('mt-2 rounded-xl border-2 px-2.5 py-2', result.ok ? 'border-leaf/30 bg-[#F3FFF7]' : 'border-coral/40 bg-[#FFF3F0]')}>
+          <div className={cn('mt-2 rounded-xl border-2 px-2.5 py-2', result.ok ? 'border-leaf/30 bg-success-soft' : 'border-coral/40 bg-danger-soft')}>
             <div className="mb-1 flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/45">
               <Icon name={result.ok ? 'check' : 'alert'} size={11} /> Output
             </div>
@@ -78,6 +78,7 @@ export default function LearningRoom() {
 
   const [tab, setTab] = useState<Tab>('materi')
   const [code, setCode] = useState(found?.level.challenge.starter ?? '')
+  const [fillAnswers, setFillAnswers] = useState<string[]>(() => found?.level.challenge.fill?.blanks.map(() => '') ?? [])
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<ChallengeResult | null>(null)
   const [failed, setFailed] = useState(0)
@@ -95,6 +96,25 @@ export default function LearningRoom() {
   )
   const allAnswered = quiz.length > 0 && quiz.every((q) => answers[q.id] !== undefined)
   const scorePercent = quiz.length ? Math.round((correctCount / quiz.length) * 100) : 0
+  const fill = found?.level.challenge.fill
+  const fillCode = useMemo(() => {
+    if (!fill) return code
+    let blankIndex = 0
+    return fill.template.replace(/\{\{blank\}\}/g, () => fillAnswers[blankIndex++]?.trim() || '___')
+  }, [fill, fillAnswers, code])
+
+  useEffect(() => {
+    setTab('materi')
+    setCode(found?.level.challenge.starter ?? '')
+    setFillAnswers(found?.level.challenge.fill?.blanks.map(() => '') ?? [])
+    setResult(null)
+    setFailed(0)
+    setHint(false)
+    setShowSolution(false)
+    setAnswers({})
+    setShowResults(false)
+    setCompletedSummary(null)
+  }, [levelId, found])
 
   if (!save) return null
   if (!found) return <Navigate to="/adventure" replace />
@@ -115,12 +135,15 @@ export default function LearningRoom() {
     if (running) return
     startLesson()
     setRunning(true)
-    const res = await runPython(code, input ?? '')
+    const res = await runPython(fillCode, input ?? '')
+    const friendly = friendlyPythonError(res.error)
     setResult({
       passed: false,
       output: res.output,
       error: res.error,
-      message: res.ok ? 'Kode berjalan. Bandingkan output-nya, lalu tekan Periksa.' : res.error,
+      message: res.ok
+        ? 'Kode berjalan. Bandingkan output-nya, lalu tekan Periksa.'
+        : `${friendly.title}${friendly.line ? ` (baris ${friendly.line})` : ''}. ${friendly.hint}`,
     })
     setRunning(false)
     if (res.ok) recordCodeRun(true)
@@ -130,7 +153,7 @@ export default function LearningRoom() {
     if (running) return
     startLesson()
     setRunning(true)
-    const res = await checkChallenge(level.challenge, code)
+    const res = await checkChallenge(level.challenge, fillCode)
     setResult(res)
     setRunning(false)
     if (res.passed) {
@@ -201,7 +224,7 @@ export default function LearningRoom() {
             <p className="mt-0.5 max-w-2xl text-xs font-semibold leading-relaxed text-ink/55">{level.summary}</p>
           </div>
         </div>
-        <div className="flex gap-1.5 rounded-2xl border-[3px] border-ink/10 bg-white/60 p-1">
+        <div role="tablist" aria-label="Bagian misi" className="flex gap-1.5 rounded-2xl border-[3px] border-ink/10 bg-surface/60 p-1">
           {(
             [
               ['materi', 'Materi', 'book'],
@@ -211,10 +234,13 @@ export default function LearningRoom() {
           ).map(([id, label, icon]) => (
             <button
               key={id}
+              role="tab"
+              aria-label={label}
+              aria-selected={tab === id}
               onClick={() => setTab(id)}
               className={cn(
-                'flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[11px] font-extrabold transition',
-                tab === id ? 'border-2 border-ink bg-sun shadow-pop-sm' : 'text-ink/50 hover:bg-white',
+                'flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[11px] font-extrabold transition sm:min-w-0',
+                tab === id ? 'border-2 border-ink bg-sun shadow-pop-sm' : 'text-ink/50 hover:bg-surface',
               )}
               aria-current={tab === id ? 'step' : undefined}
             >
@@ -227,16 +253,16 @@ export default function LearningRoom() {
       </div>
 
       {completed && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border-2 border-leaf/40 bg-[#F3FFF7] px-3 py-2 text-[11px] font-bold text-leafDark">
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border-2 border-leaf/40 bg-success-soft px-3 py-2 text-[11px] font-bold text-leafDark">
           <Icon name="check" size={14} />
           Misi ini sudah selesai. Hadiah utama sudah kamu terima; mengulang tetap bagus untuk latihan.
-          {next && <Link to={`/lesson/${next.id}`} className="ml-auto inline-flex items-center gap-1 rounded-lg border-2 border-leaf/40 bg-white px-2 py-1 font-extrabold hover:border-leaf">Misi berikutnya <Icon name="arrow-right" size={11} /></Link>}
+          {next && <Link to={`/lesson/${next.id}`} className="ml-auto inline-flex items-center gap-1 rounded-lg border-2 border-leaf/40 bg-surface px-2 py-1 font-extrabold hover:border-leaf">Misi berikutnya <Icon name="arrow-right" size={11} /></Link>}
         </div>
       )}
 
       {tab === 'materi' && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
-          <div className="space-y-4">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_290px]">
+          <div className="min-w-0 space-y-4">
             <Card className="p-4 sm:p-5">
               <div className="flex items-center gap-2">
                 <span className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink bg-mint"><Icon name="compass" size={15} /></span>
@@ -262,7 +288,7 @@ export default function LearningRoom() {
                   </div>
                 )}
                 {section.tip && (
-                  <div className="mt-3 flex gap-2 rounded-xl border-2 border-sun/60 bg-[#FFF8DF] px-3 py-2">
+                  <div className="mt-3 flex gap-2 rounded-xl border-2 border-sun/60 bg-warning-soft px-3 py-2">
                     <Icon name="lightbulb" size={16} className="mt-0.5 shrink-0 text-sunDark" />
                     <p className="text-[11px] font-bold leading-relaxed text-ink/65">{section.tip}</p>
                   </div>
@@ -302,7 +328,7 @@ export default function LearningRoom() {
               </div>
               <div className="mt-2 space-y-1.5">
                 {level.sources.map((s) => (
-                  <a key={s.url} href={s.url} target="_blank" rel="noreferrer noopener" className="flex items-center gap-1.5 rounded-lg border-2 border-ink/10 bg-white/60 px-2 py-1.5 text-[10px] font-bold text-ink/60 hover:border-ink/25 hover:text-ink">
+                  <a key={s.url} href={s.url} target="_blank" rel="noreferrer noopener" className="flex items-center gap-1.5 rounded-lg border-2 border-ink/10 bg-surface/60 px-2 py-1.5 text-[10px] font-bold text-ink/60 hover:border-ink/25 hover:text-ink">
                     <span className="flex-1 truncate">{s.label}</span>
                     <Icon name="external" size={10} className="shrink-0 text-ink/30" />
                   </a>
@@ -319,8 +345,8 @@ export default function LearningRoom() {
       )}
 
       {tab === 'tantangan' && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
-          <div className="space-y-3">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_290px]">
+          <div className="min-w-0 space-y-3">
             <Card className="p-4 sm:p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -333,12 +359,12 @@ export default function LearningRoom() {
               {level.challenge.check === 'output' && level.challenge.expected && (
                 <div className="mt-3">
                   <div className="mb-1 text-[9px] font-extrabold uppercase tracking-wide text-ink/40">Output yang diharapkan</div>
-                  <pre className="overflow-x-auto rounded-xl border-2 border-ink/10 bg-[#0F2B20] px-3 py-2 font-mono text-[11px] text-[#B9F5CE]">{level.challenge.expected}</pre>
+                  <pre className="overflow-x-auto rounded-xl border-2 border-ink/10 bg-code px-3 py-2 font-mono text-[11px] text-[#B9F5CE]">{level.challenge.expected}</pre>
                 </div>
               )}
               {input && (
-                <div className="mt-2 rounded-xl border-2 border-grape/40 bg-[#F7F2FF] px-2.5 py-1.5 text-[10px] font-bold text-ink/55">
-                  Input yang diberikan saat pemeriksaan: <code className="rounded bg-white px-1 font-mono text-[10px]">{input}</code>
+                <div className="mt-2 rounded-xl border-2 border-grape/40 bg-grape-soft px-2.5 py-1.5 text-[10px] font-bold text-ink/55">
+                  Input yang diberikan saat pemeriksaan: <code className="rounded bg-surface px-1 font-mono text-[10px]">{input}</code>
                 </div>
               )}
               {level.challenge.check === 'tests' && (
@@ -346,17 +372,70 @@ export default function LearningRoom() {
               )}
             </Card>
 
+            {level.challenge.kind === 'project' && level.challenge.requirements && (
+              <Card className="border-grape/30 bg-grape-soft/60 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink bg-grape"><Icon name="star" size={15} /></span>
+                  <div>
+                    <h3 className="font-display text-sm font-extrabold">Mini project checklist</h3>
+                    <p className="text-[10px] font-semibold text-ink/45">Pastikan semua poin ini ada sebelum memeriksa.</p>
+                  </div>
+                </div>
+                <ul className="mt-2.5 space-y-1.5">
+                  {level.challenge.requirements.map((requirement) => (
+                    <li key={requirement} className="flex gap-2 text-[11px] font-semibold leading-snug text-ink/65">
+                      <Icon name="check" size={12} className="mt-0.5 shrink-0 text-leafDark" />
+                      {requirement}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
             <Card className="overflow-hidden">
               <div className="p-3">
-                <div onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); void check() } }}>
-                  <CodeEditor
-                    value={code}
-                    onChange={setCode}
-                    minHeight={210}
-                    maxHeight={430}
-                    showLineNumbers={save.settings.showLineNumbers}
-                  />
-                </div>
+                {level.challenge.kind === 'fill' && fill ? (
+                  <div className="rounded-2xl border-[3px] border-ink bg-code px-3 py-4 text-code-ink">
+                    <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-code-ink/45">
+                      <Icon name="code" size={12} /> Lengkapi bagian kosong
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-1 gap-y-2 font-mono text-[15px] leading-loose">
+                      {fill.template.split('{{blank}}').map((part, index) => (
+                        <Fragment key={index}>
+                          <span className="whitespace-pre-wrap">{part}</span>
+                          {index < fill.blanks.length && (
+                            <input
+                              value={fillAnswers[index] ?? ''}
+                              onChange={(event) => {
+                                const next = [...fillAnswers]
+                                next[index] = event.target.value
+                                setFillAnswers(next)
+                              }}
+                              placeholder={fill.blanks[index].placeholder}
+                              aria-label={`Bagian kosong ${index + 1}`}
+                              autoComplete="off"
+                              spellCheck={false}
+                              className="min-w-24 rounded-lg border-2 border-sun/70 bg-code-deep px-2 py-1 font-mono text-[13px] text-code-ink outline-none placeholder:text-code-ink/30 focus:border-sun"
+                            />
+                          )}
+                        </Fragment>
+                      ))}
+                    </div>
+                    <div className="mt-3 rounded-xl border border-white/10 bg-code-deep px-2.5 py-2 font-mono text-[11px] text-code-ink/55">
+                      Pratinjau: <span className="text-[#B9F5CE]">{fillCode}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); void check() } }}>
+                    <CodeEditor
+                      value={code}
+                      onChange={setCode}
+                      minHeight={210}
+                      maxHeight={430}
+                      showLineNumbers={save.settings.showLineNumbers}
+                    />
+                  </div>
+                )}
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   <Button size="sm" variant="primary" icon={running ? 'clock' : 'check'} onClick={check} disabled={running}>
                     {running ? 'Memeriksa...' : 'Periksa Jawaban'}
@@ -364,12 +443,12 @@ export default function LearningRoom() {
                   <Button size="sm" variant="secondary" icon="play" onClick={runChallenge} disabled={running}>
                     Jalankan saja
                   </Button>
-                  <Button size="sm" variant="ghost" icon="refresh-cw" onClick={() => { setCode(level.challenge.starter); setResult(null) }}>
+                  <Button size="sm" variant="ghost" icon="refresh-cw" onClick={() => { setCode(level.challenge.starter); setFillAnswers(level.challenge.fill?.blanks.map(() => '') ?? []); setResult(null) }}>
                     Reset
                   </Button>
                   <button
                     onClick={() => setHint(true)}
-                    className="ml-auto inline-flex items-center gap-1 rounded-lg border-2 border-sun/60 bg-[#FFF8DF] px-2 py-1 text-[10px] font-extrabold text-ink/60 hover:border-sun"
+                    className="ml-auto inline-flex items-center gap-1 rounded-lg border-2 border-sun/60 bg-warning-soft px-2 py-1 text-[10px] font-extrabold text-ink/60 hover:border-sun"
                   >
                     <Icon name="lightbulb" size={11} /> Petunjuk Pipi
                   </button>
@@ -378,7 +457,7 @@ export default function LearningRoom() {
               </div>
 
               {result && (
-                <div className={cn('border-t-[3px] px-3 py-2.5', result.passed ? 'border-leaf/30 bg-[#F3FFF7]' : 'border-coral/30 bg-[#FFF3F0]')}>
+                <div className={cn('border-t-[3px] px-3 py-2.5', result.passed ? 'border-leaf/30 bg-success-soft' : 'border-coral/30 bg-danger-soft')}>
                   <div className="flex items-center gap-1.5">
                     <span className={cn('grid h-6 w-6 place-items-center rounded-full border-2 border-ink', result.passed ? 'bg-leaf text-white' : 'bg-coral')}>
                       <Icon name={result.passed ? 'check' : 'alert'} size={12} />
@@ -387,7 +466,7 @@ export default function LearningRoom() {
                   </div>
                   <p className="mt-1 whitespace-pre-wrap text-[11px] font-semibold leading-relaxed text-ink/65">{result.message}</p>
                   {(result.output || result.error) && (
-                    <pre className="mt-1.5 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-ink/10 bg-white/70 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-ink/65">
+                    <pre className="mt-1.5 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-ink/10 bg-surface/70 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-ink/65">
                       {result.error.trim() ? result.error.trim().split('\n').slice(-6).join('\n') : result.output}
                     </pre>
                   )}
@@ -401,7 +480,7 @@ export default function LearningRoom() {
             </Card>
 
             {hint && (
-              <div className="flex gap-2 rounded-2xl border-[3px] border-sun/60 bg-[#FFF8DF] p-3">
+              <div className="flex gap-2 rounded-2xl border-[3px] border-sun/60 bg-warning-soft p-3">
                 <Pipi mood="hint" size={58} />
                 <div>
                   <div className="font-display text-xs font-extrabold text-ink/75">Petunjuk dari Pipi</div>
@@ -416,11 +495,11 @@ export default function LearningRoom() {
               </button>
             )}
             {showSolution && (
-              <div className="rounded-2xl border-[3px] border-ink/15 bg-white/70 p-3">
+              <div className="rounded-2xl border-[3px] border-ink/15 bg-surface/70 p-3">
                 <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wide text-ink/45">
                   <Icon name="eye" size={12} /> Solusi referensi
                 </div>
-                <pre className="mt-1.5 overflow-x-auto rounded-xl bg-[#0F2B20] px-3 py-2 font-mono text-[11px] text-[#B9F5CE]">{level.challenge.solution}</pre>
+                <pre className="mt-1.5 overflow-x-auto rounded-xl bg-code px-3 py-2 font-mono text-[11px] text-[#B9F5CE]">{level.challenge.solution}</pre>
                 <div className="mt-2 flex gap-1.5">
                   <Button size="sm" variant="secondary" icon="copy" onClick={() => setCode(level.challenge.solution)}>Isi ke editor</Button>
                   <Button size="sm" variant="ghost" onClick={() => setShowSolution(false)}>Tutup</Button>
@@ -434,10 +513,10 @@ export default function LearningRoom() {
               <h3 className="font-display text-sm font-extrabold">Cara memeriksa</h3>
               <p className="mt-1.5 text-[11px] font-semibold leading-relaxed text-ink/60">
                 {level.challenge.check === 'output'
-                  ? 'Pipi menjalankan kodemu di Python asli dan membandingkan output dengan jawaban yang diharapkan. Spasi di akhir baris tidak dihitung.'
+                  ? 'Pipi menjalankan kodemu di Python asli dan membandingkan output dengan jawaban yang diharapkan. Huruf besar/kecil, spasi berlebih, dan spasi di akhir baris tidak dihitung.'
                   : 'Pipi menambahkan pemeriksaan otomatis setelah kodemu. Jangan hapus atau ubah nama variabel yang diminta.'}
               </p>
-              <div className="mt-2 rounded-lg bg-white/60 px-2 py-1.5 text-[10px] font-bold text-ink/45">
+              <div className="mt-2 rounded-lg bg-surface/60 px-2 py-1.5 text-[10px] font-bold text-ink/45">
                 Hadiah tantangan: +30 XP • +10 koin (sekali)
               </div>
             </Card>
@@ -466,10 +545,10 @@ export default function LearningRoom() {
       )}
 
       {tab === 'kuis' && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_290px]">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[1fr_290px]">
           <div>
             <Card className="overflow-hidden">
-              <div className="flex items-center justify-between gap-2 border-b-[3px] border-ink/10 bg-[#F4EEFF] px-4 py-2.5">
+              <div className="flex items-center justify-between gap-2 border-b-[3px] border-ink/10 bg-grape-soft px-4 py-2.5">
                 <div className="flex items-center gap-2">
                   <span className="grid h-7 w-7 place-items-center rounded-lg border-2 border-ink bg-grape"><Icon name="lightbulb" size={14} /></span>
                   <span className="font-display text-xs font-extrabold">Kuis pemahaman</span>
@@ -490,10 +569,10 @@ export default function LearningRoom() {
                     return (
                       <div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="rounded-full border-2 border-ink/15 bg-white px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/45">
+                          <span className="rounded-full border-2 border-ink/15 bg-surface px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-ink/45">
                             Soal {quizIndex + 1} dari {quiz.length}
                           </span>
-                          <span className="rounded-full border-2 border-grape/30 bg-[#F7F2FF] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-grapeDark">
+                          <span className="rounded-full border-2 border-grape/30 bg-grape-soft px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-grapeDark">
                             {q.kind === 'mc' ? 'Pilihan ganda' : q.kind === 'output' ? 'Prediksi output' : q.kind === 'fill' ? 'Isi bagian kosong' : 'Perbaiki kode'}
                           </span>
                         </div>
@@ -514,22 +593,22 @@ export default function LearningRoom() {
                                 disabled={answered}
                                 className={cn(
                                   'flex w-full items-center gap-2.5 rounded-xl border-[3px] px-3 py-2 text-left text-xs font-bold transition',
-                                  !answered && 'border-ink/10 bg-white hover:border-ink/30 hover:bg-cream',
-                                  answered && isAnswer && 'border-leaf bg-[#F3FFF7] text-leafDark',
-                                  answered && isChosen && !isAnswer && 'border-coral bg-[#FFF3F0] text-[#B3341F]',
-                                  answered && !isChosen && !isAnswer && 'border-ink/5 bg-white/40 text-ink/35',
+                                  !answered && 'border-ink/10 bg-surface hover:border-ink/30 hover:bg-cream',
+                                  answered && isAnswer && 'border-leaf bg-success-soft text-leafDark',
+                                  answered && isChosen && !isAnswer && 'border-coral bg-danger-soft text-danger',
+                                  answered && !isChosen && !isAnswer && 'border-ink/5 bg-surface/40 text-ink/35',
                                 )}
                               >
                                 <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-lg border-2 font-display text-[10px] font-extrabold', answered && isAnswer ? 'border-leaf bg-leaf text-white' : answered && isChosen ? 'border-coral bg-coral' : 'border-ink/15 bg-cream')}>
                                   {answered && isAnswer ? '✓' : answered && isChosen ? '×' : String.fromCharCode(65 + i)}
                                 </span>
-                                <span className="flex-1">{option}</span>
+                                <span className="flex-1 whitespace-pre-line">{option}</span>
                               </button>
                             )
                           })}
                         </div>
                         {answered && (
-                          <div className={cn('mt-3 rounded-xl border-2 px-3 py-2', correct ? 'border-leaf/40 bg-[#F3FFF7]' : 'border-coral/30 bg-[#FFF3F0]')}>
+                          <div className={cn('mt-3 rounded-xl border-2 px-3 py-2', correct ? 'border-leaf/40 bg-success-soft' : 'border-coral/30 bg-danger-soft')}>
                             <div className="flex items-center gap-1.5 font-display text-xs font-extrabold">
                               <Icon name={correct ? 'check' : 'alert'} size={13} />
                               {correct ? 'Tepat sekali!' : 'Belum tepat'}
@@ -563,7 +642,7 @@ export default function LearningRoom() {
                           </div>
                         )}
                         {hint && !answered && (
-                          <div className="mt-2 flex gap-2 rounded-xl border-2 border-sun/50 bg-[#FFF8DF] px-2.5 py-2">
+                          <div className="mt-2 flex gap-2 rounded-xl border-2 border-sun/50 bg-warning-soft px-2.5 py-2">
                             <Icon name="hint" size={14} className="mt-0.5 shrink-0 text-sunDark" />
                             <p className="text-[10px] font-bold leading-relaxed text-ink/60">{q.hint}</p>
                           </div>
@@ -584,7 +663,7 @@ export default function LearningRoom() {
                   </div>
 
                   {!solved ? (
-                    <div className="mx-auto mt-4 max-w-md rounded-2xl border-2 border-coral/40 bg-[#FFF3F0] p-3">
+                    <div className="mx-auto mt-4 max-w-md rounded-2xl border-2 border-coral/40 bg-danger-soft p-3">
                       <div className="font-display text-sm font-extrabold">Satu langkah tersisa</div>
                       <p className="mt-0.5 text-[11px] font-semibold text-ink/60">
                         Tantangan kode belum lolos. Selesaikan tantangan agar misi bisa dituntaskan dan hadiah diberikan.
@@ -594,7 +673,7 @@ export default function LearningRoom() {
                       </Button>
                     </div>
                   ) : completed || completedSummary ? (
-                    <div className="mx-auto mt-4 max-w-md rounded-2xl border-2 border-leaf/40 bg-[#F3FFF7] p-3">
+                    <div className="mx-auto mt-4 max-w-md rounded-2xl border-2 border-leaf/40 bg-success-soft p-3">
                       <div className="flex items-center justify-center gap-1.5 font-display text-sm font-extrabold text-leafDark">
                         <Icon name="check" size={15} /> Misi tuntas!
                       </div>
@@ -641,19 +720,19 @@ export default function LearningRoom() {
                   Materi dibaca
                 </li>
                 <li className="flex items-center gap-2 text-[11px] font-bold">
-                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', solved ? 'bg-leaf text-white' : 'bg-white/60')}>
+                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', solved ? 'bg-leaf text-white' : 'bg-surface/60')}>
                     <Icon name={solved ? 'check' : 'terminal'} size={10} />
                   </span>
                   Tantangan {solved ? 'lolos' : 'belum lolos'}
                 </li>
                 <li className="flex items-center gap-2 text-[11px] font-bold">
-                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', allAnswered ? 'bg-leaf text-white' : 'bg-white/60')}>
+                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', allAnswered ? 'bg-leaf text-white' : 'bg-surface/60')}>
                     <Icon name={allAnswered ? 'check' : 'lightbulb'} size={10} />
                   </span>
                   Kuis {allAnswered ? `${correctCount}/${quiz.length} benar` : 'belum selesai'}
                 </li>
                 <li className="flex items-center gap-2 text-[11px] font-bold">
-                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', completed ? 'bg-leaf text-white' : 'bg-white/60')}>
+                  <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2 border-ink', completed ? 'bg-leaf text-white' : 'bg-surface/60')}>
                     <Icon name={completed ? 'check' : 'trophy'} size={10} />
                   </span>
                   Hadiah misi {completed ? 'diterima' : 'belum diklaim'}

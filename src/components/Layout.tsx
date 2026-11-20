@@ -6,6 +6,7 @@ import { Pipi } from './Pipi'
 import { Icon } from './Icon'
 import { Avatar } from './Avatar'
 import { Onboarding } from './Onboarding'
+import { ThemeToggle } from './ThemeToggle'
 import { ProgressBar, cn } from './ui'
 
 const NAV = [
@@ -36,7 +37,7 @@ function useNavActive() {
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/dashboard" className="group flex items-center gap-2.5" aria-label="PIPI CODE ADVENTURE - Dashboard">
-      <span className="relative grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border-[3px] border-ink bg-mint shadow-pop-sm transition group-hover:-rotate-3">
+      <span className="relative grid h-11 w-11 -rotate-2 place-items-center overflow-hidden rounded-lg border-2 border-ink bg-sun shadow-pop-sm transition group-hover:rotate-0">
         <span className="absolute -bottom-2">
           <Pipi mood="happy" size={50} />
         </span>
@@ -70,14 +71,14 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
               'group flex items-center gap-2.5 rounded-xl border-2 px-3 py-2 font-display text-[13px] font-bold transition',
               active
                 ? 'border-ink bg-sun text-ink shadow-pop-sm'
-                : 'border-transparent text-ink/65 hover:border-ink/10 hover:bg-white/70 hover:text-ink',
+                : 'border-transparent text-ink/65 hover:border-ink/10 hover:bg-cream hover:text-ink',
             )}
             aria-current={active ? 'page' : undefined}
           >
             <span
               className={cn(
                 'grid h-7 w-7 place-items-center rounded-lg border-2 transition',
-                active ? 'border-ink bg-white/60' : 'border-transparent bg-ink/5 group-hover:bg-white',
+                active ? 'border-ink bg-surface/60' : 'border-transparent bg-ink/5 group-hover:bg-surface',
               )}
             >
               <Icon name={item.icon} size={15} />
@@ -95,9 +96,10 @@ function Sidebar() {
   if (!save) return null
   const progress = levelProgress(save.xp)
   return (
-    <aside className="sticky top-0 hidden h-screen w-[258px] shrink-0 flex-col border-r-[3px] border-ink/10 bg-paper/80 px-4 py-4 backdrop-blur lg:flex">
-      <div className="px-1">
+    <aside className="sticky top-0 hidden h-screen w-[258px] shrink-0 flex-col border-r-2 border-ink/15 bg-surface px-4 py-4 lg:flex">
+      <div className="flex items-center justify-between gap-2 px-1">
         <Logo />
+        <ThemeToggle label={false} />
       </div>
 
       <div className="mt-4 rounded-2xl border-[3px] border-ink bg-mint/60 p-3 shadow-pop-sm">
@@ -113,7 +115,7 @@ function Sidebar() {
             <Icon name="coin" size={12} className="text-sunDark" /> {save.coins}
           </span>
           <span className="inline-flex items-center gap-1 text-ink/70">
-            <Icon name="flame" size={12} className="text-coral" /> {save.streak.count} hari
+            <Icon name="flame" size={12} className="text-coral-text" /> {save.streak.count} hari
           </span>
         </div>
       </div>
@@ -124,7 +126,7 @@ function Sidebar() {
 
       <Link
         to="/profile"
-        className="mt-2 flex items-center gap-2.5 rounded-2xl border-[3px] border-ink bg-white/80 p-2 shadow-pop-sm transition hover:-translate-y-0.5 hover:bg-white"
+        className="mt-2 flex items-center gap-2.5 rounded-2xl border-[3px] border-ink bg-surface/80 p-2 shadow-pop-sm transition hover:-translate-y-0.5 hover:bg-surface"
       >
         <Avatar avatar={save.profile.avatar} size={38} ring={false} />
         <span className="min-w-0 flex-1">
@@ -141,23 +143,24 @@ function MobileHeader({ onMenu }: { onMenu: () => void }) {
   const { save, level } = useGame()
   if (!save) return null
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-ink/10 bg-cream/90 px-3 py-2.5 backdrop-blur lg:hidden">
+    <header className="sticky top-0 z-40 border-b-2 border-ink/15 bg-paper px-3 py-2.5 lg:hidden">
       <div className="flex items-center gap-2">
         <button
           onClick={onMenu}
-          className="grid h-9 w-9 place-items-center rounded-xl border-2 border-ink bg-white shadow-pop-sm"
+          className="grid h-9 w-9 place-items-center rounded-xl border-2 border-ink bg-surface shadow-pop-sm"
           aria-label="Buka menu"
         >
           <Icon name="menu" size={18} />
         </button>
         <Logo />
         <div className="ml-auto flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 rounded-full border-2 border-ink/15 bg-white/80 px-2 py-1 text-[11px] font-extrabold">
+          <ThemeToggle label={false} />
+          <span className="hidden items-center gap-1 rounded-full border-2 border-ink/15 bg-surface/80 px-2 py-1 text-[11px] font-extrabold min-[400px]:inline-flex">
             <Icon name="coin" size={12} className="text-sunDark" />
             {save.coins}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full border-2 border-ink/15 bg-white/80 px-2 py-1 text-[11px] font-extrabold">
-            <Icon name="flame" size={12} className="text-coral" />
+          <span className="hidden items-center gap-1 rounded-full border-2 border-ink/15 bg-surface/80 px-2 py-1 text-[11px] font-extrabold min-[350px]:inline-flex">
+            <Icon name="flame" size={12} className="text-coral-text" />
             {save.streak.count}
           </span>
           <Link to="/profile" className="relative" aria-label="Profil">
@@ -182,14 +185,14 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
   }, [open])
   if (!save) return null
   return (
-    <div className={cn('fixed inset-0 z-[65] lg:hidden', open ? 'pointer-events-auto' : 'pointer-events-none')}>
+    <div className={cn('fixed inset-0 z-[65] overflow-hidden lg:hidden', open ? 'pointer-events-auto' : 'pointer-events-none hidden')}>
       <div
-        className={cn('absolute inset-0 bg-ink/45 backdrop-blur-sm transition-opacity', open ? 'opacity-100' : 'opacity-0')}
+        className={cn('absolute inset-0 bg-ink/55 transition-opacity', open ? 'opacity-100' : 'opacity-0')}
         onClick={onClose}
       />
       <div
         className={cn(
-          'absolute inset-y-0 left-0 flex w-[86%] max-w-[320px] flex-col border-r-[3px] border-ink bg-paper px-4 py-4 shadow-pop-lg transition-transform duration-300',
+          'absolute inset-y-0 left-0 flex w-[86%] max-w-[320px] flex-col border-r-2 border-ink bg-paper px-4 py-4 shadow-pop-lg transition-transform duration-300',
           open ? 'translate-x-0' : '-translate-x-full',
         )}
         role="dialog"
@@ -200,7 +203,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
           <Logo />
           <button
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-xl border-2 border-ink bg-white"
+            className="grid h-9 w-9 place-items-center rounded-xl border-2 border-ink bg-surface"
             aria-label="Tutup menu"
           >
             <Icon name="x" size={17} />
@@ -230,7 +233,7 @@ function BottomNav() {
   const isActive = useNavActive()
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t-[3px] border-ink bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink bg-paper pb-[env(safe-area-inset-bottom)] lg:hidden"
       aria-label="Navigasi cepat"
     >
       <div className="grid grid-cols-5">
@@ -242,11 +245,11 @@ function BottomNav() {
               to={item.to}
               className={cn(
                 'relative flex flex-col items-center gap-0.5 py-2 text-[9.5px] font-extrabold transition',
-                active ? 'text-leafDark' : 'text-ink/45',
+                active ? 'text-leafDark' : 'text-ink/45 hover:text-ink/75',
               )}
               aria-current={active ? 'page' : undefined}
             >
-              {active && <span className="absolute top-0 h-1 w-7 rounded-b-full bg-sun" />}
+              {active && <span className="absolute top-0 h-1 w-8 bg-leaf" />}
               <Icon name={item.icon} size={19} />
               <span className="truncate px-0.5">{item.label.replace('Peta Petualangan', 'Peta').replace('Pipi Tutor', 'Tutor')}</span>
             </Link>
@@ -270,11 +273,18 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen">
+      <a href="#pipi-main" className="skip-link">
+        Lewati ke konten utama
+      </a>
       <Sidebar />
       <div className="min-w-0 flex-1">
         <MobileHeader onMenu={() => setDrawer(true)} />
         <MobileDrawer open={drawer} onClose={() => setDrawer(false)} />
-        <main id="pipi-main" className="mx-auto w-full max-w-6xl px-3 pb-24 pt-4 sm:px-5 lg:px-8 lg:pb-12 lg:pt-8">
+        <main
+          id="pipi-main"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-6xl px-3 pb-24 pt-4 sm:px-5 lg:px-8 lg:pb-12 lg:pt-8"
+        >
           <Outlet />
         </main>
       </div>

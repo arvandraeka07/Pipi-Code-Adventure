@@ -12,7 +12,7 @@ export const world5: World = {
   description:
     'Buat function sendiri, kirim parameter, dan kembalikan hasil dengan return agar kode rapi dan bisa dipakai ulang.',
   icon: 'function',
-  palette: { from: '#8FB8FF', to: '#4E6FE0', accent: '#FFC93C', soft: '#E3EEFF' },
+  palette: { from: '#8B7DD8', to: '#5A4DA3', accent: '#F5B53C', soft: '#ECE8FA' },
   reward: { xp: 180, coins: 90, badge: 'function-expert' },
   levels: [
     {

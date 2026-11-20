@@ -1,4 +1,5 @@
 import type { Level, QuizQuestion, World } from '../../types'
+import { QUIZ_REWRITES } from '../simplifiedQuiz'
 import { world1 } from './world1'
 import { world2 } from './world2'
 import { world3 } from './world3'
@@ -7,7 +8,7 @@ import { world5 } from './world5'
 import { world6 } from './world6'
 import { world7 } from './world7'
 
-export const WORLDS: World[] = [
+const WORLD_DATA: World[] = [
   world1,
   world2,
   world3,
@@ -16,6 +17,40 @@ export const WORLDS: World[] = [
   world6,
   world7,
 ]
+
+const ANSWER_SLOTS = (() => {
+  const slots = Array.from({ length: 84 }, (_, index) => index % 3)
+  let seed = 20261119
+  for (let index = slots.length - 1; index > 0; index -= 1) {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    const swap = seed % (index + 1)
+    ;[slots[index], slots[swap]] = [slots[swap], slots[index]]
+  }
+  return slots
+})()
+
+let answerSlot = 0
+
+function spreadAnswer(question: QuizQuestion): QuizQuestion {
+  const options = [...question.options]
+  const target = ANSWER_SLOTS[answerSlot++ % ANSWER_SLOTS.length] % options.length
+  if (question.answer === target) return { ...question, options }
+  const [correct] = options.splice(question.answer, 1)
+  options.splice(target, 0, correct)
+  return { ...question, options, answer: target }
+}
+
+export const WORLDS: World[] = WORLD_DATA.map((world) => ({
+  ...world,
+  levels: world.levels.map((level) => ({
+    ...level,
+    quiz: level.quiz.map((question) => {
+      const rewrite = QUIZ_REWRITES[question.id]
+      const merged = rewrite ? { ...question, ...rewrite } : question
+      return spreadAnswer(merged)
+    }),
+  })),
+}))
 
 export const ALL_LEVELS: { world: World; level: Level }[] = WORLDS.flatMap((world) =>
   world.levels.map((level) => ({ world, level })),
@@ -69,6 +104,7 @@ if (import.meta.env.DEV) {
       for (const q of level.quiz) {
         if (qids.has(q.id)) console.warn(`Duplicate question id: ${q.id}`)
         qids.add(q.id)
+        if (!QUIZ_REWRITES[q.id]) console.warn(`Question ${q.id} has no simplified rewrite`)
         if (q.answer < 0 || q.answer >= q.options.length) {
           console.warn(`Question ${q.id} has invalid answer index`)
         }

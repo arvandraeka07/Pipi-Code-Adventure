@@ -47,6 +47,11 @@ export interface QuizQuestion {
   hint: string
 }
 
+export interface FillBlank {
+  answer: string
+  placeholder?: string
+}
+
 export interface Challenge {
   prompt: string
   starter: string
@@ -56,6 +61,12 @@ export interface Challenge {
   expected?: string
   stdin?: string
   tests?: string
+  kind?: 'code' | 'fill' | 'project'
+  fill?: {
+    template: string
+    blanks: FillBlank[]
+  }
+  requirements?: string[]
 }
 
 export interface Level {

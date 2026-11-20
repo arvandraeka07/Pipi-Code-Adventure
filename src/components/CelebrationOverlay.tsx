@@ -74,13 +74,13 @@ export function CelebrationOverlay({
           <p className="mx-auto mt-2 max-w-sm text-sm font-semibold leading-relaxed text-ink/70">{item.message}</p>
 
           {item.kind === 'evolve' && (
-            <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-white/80 px-3 py-1.5 font-display text-xs font-extrabold text-ink">
+            <div className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border-2 border-ink bg-surface/80 px-3 py-1.5 font-display text-xs font-extrabold text-ink">
               <Icon name="sparkles" size={14} />
               {STAGE_LABEL[stage]}
             </div>
           )}
           {item.kind === 'badge' && badge && (
-            <div className="mx-auto mt-3 max-w-xs rounded-2xl border-2 border-ink/15 bg-white/70 px-3 py-2 text-xs font-semibold text-ink/60">
+            <div className="mx-auto mt-3 max-w-xs rounded-2xl border-2 border-ink/15 bg-surface/70 px-3 py-2 text-xs font-semibold text-ink/60">
               {badge.requirement}
             </div>
           )}

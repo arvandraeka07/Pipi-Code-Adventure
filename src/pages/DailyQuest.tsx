@@ -78,12 +78,12 @@ export default function DailyQuest() {
               <div className="min-w-[180px] flex-1">
                 <div className="mb-1 flex items-center justify-between text-[9px] font-extrabold uppercase tracking-wide text-ink/40">
                   <span>7 hari terakhir</span>
-                  <span className={activeToday ? 'text-leafDark' : 'text-coral'}>{activeToday ? 'Aktif hari ini' : 'Belum aktif hari ini'}</span>
+                  <span className={activeToday ? 'text-leafDark' : 'text-coral-text'}>{activeToday ? 'Aktif hari ini' : 'Belum aktif hari ini'}</span>
                 </div>
                 <div className="flex items-end justify-between gap-1">
                   {days.map((d) => (
                     <div key={d.key} className="flex flex-1 flex-col items-center gap-1">
-                      <span className={cn('grid h-7 w-7 place-items-center rounded-full border-2 text-[9px] font-extrabold', d.active ? 'border-ink bg-coral text-ink' : d.isToday ? 'border-coral bg-white text-coral' : 'border-ink/10 bg-white/60 text-ink/30')}>
+                      <span className={cn('grid h-7 w-7 place-items-center rounded-full border-2 text-[9px] font-extrabold', d.active ? 'border-ink bg-coral text-ink' : d.isToday ? 'border-coral bg-surface text-coral-text' : 'border-ink/10 bg-surface/60 text-ink/30')}>
                         {d.active ? <Icon name="flame" size={12} /> : d.day}
                       </span>
                       <span className={cn('text-[8px] font-extrabold uppercase', d.isToday ? 'text-ink' : 'text-ink/35')}>{d.label}</span>
@@ -92,7 +92,7 @@ export default function DailyQuest() {
                 </div>
               </div>
             </div>
-            <div className="relative mt-3 flex flex-wrap items-center gap-2 rounded-xl border-2 border-ink/10 bg-white/60 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
+            <div className="relative mt-3 flex flex-wrap items-center gap-2 rounded-xl border-2 border-ink/10 bg-surface/60 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
               <Icon name="info" size={12} /> Streak bertambah saat kamu melakukan aktivitas belajar hari ini.
               {!activeToday && <Link to="/playground" className="ml-auto font-extrabold text-leafDark hover:underline">Jalankan kode untuk memulai</Link>}
             </div>
@@ -163,13 +163,13 @@ export default function DailyQuest() {
                     : 'Klaim keempat quest hari ini untuk bonus +40 XP dan +15 koin.'}
                 </p>
               </div>
-              <span className={cn('rounded-full border-2 px-2 py-1 text-[10px] font-extrabold', claimedCount === 4 ? 'border-leaf/40 bg-white/60 text-leafDark' : 'border-ink/15 bg-white/60 text-ink/45')}>
+              <span className={cn('rounded-full border-2 px-2 py-1 text-[10px] font-extrabold', claimedCount === 4 ? 'border-leaf/40 bg-surface/60 text-leafDark' : 'border-ink/15 bg-surface/60 text-ink/45')}>
                 {claimedCount === 4 ? 'Diterima' : '+40 XP • +15 koin'}
               </span>
             </div>
           </Card>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-ink/10 bg-white/50 px-3 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-ink/10 bg-surface/50 px-3 py-2">
             <span className="text-[10px] font-bold text-ink/45">Baru mulai? Quest "Pemanasan Pagi" cukup satu kali jalankan kode.</span>
             <Link to="/playground"><Button size="sm" variant="secondary" icon="terminal">Buka Playground</Button></Link>
           </div>
@@ -179,12 +179,12 @@ export default function DailyQuest() {
           <Card className="p-4">
             <h3 className="font-display text-sm font-extrabold">Hadiah hari ini</h3>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <div className="rounded-xl border-2 border-ink/10 bg-[#FFF8DF] px-2 py-2 text-center">
+              <div className="rounded-xl border-2 border-ink/10 bg-warning-soft px-2 py-2 text-center">
                 <Icon name="bolt" size={16} className="mx-auto text-sunDark" />
                 <div className="mt-0.5 font-display text-lg font-extrabold leading-none">{totalXp}</div>
                 <div className="text-[9px] font-extrabold uppercase tracking-wide text-ink/40">XP tersedia</div>
               </div>
-              <div className="rounded-xl border-2 border-ink/10 bg-[#FFF4CC] px-2 py-2 text-center">
+              <div className="rounded-xl border-2 border-ink/10 bg-warning-soft px-2 py-2 text-center">
                 <Icon name="coin" size={16} className="mx-auto text-sunDark" />
                 <div className="mt-0.5 font-display text-lg font-extrabold leading-none">{totalCoins}</div>
                 <div className="text-[9px] font-extrabold uppercase tracking-wide text-ink/40">Koin tersedia</div>
@@ -199,7 +199,7 @@ export default function DailyQuest() {
 
           <Card tone="grape" className="p-4">
             <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink bg-white/70"><Icon name="lightbulb" size={15} /></span>
+              <span className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink bg-surface/70"><Icon name="lightbulb" size={15} /></span>
               <h3 className="font-display text-sm font-extrabold">Strategi cepat</h3>
             </div>
             <p className="mt-1.5 text-[11px] font-semibold leading-relaxed text-ink/60">

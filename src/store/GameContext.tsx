@@ -121,6 +121,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [celebrations, setCelebrations] = useState<CelebrationItem[]>([])
   const saveRef = useRef<SaveState | null>(null)
+  const lastPersistedRef = useRef<SaveState | null>(null)
 
   useEffect(() => {
     const registry = loadRegistry()
@@ -140,10 +141,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (accountId && save) {
-      persistSave(accountId, save)
-      setAccounts(loadRegistry())
+    if (!accountId || !save || lastPersistedRef.current === save) return
+    const saved = persistSave(accountId, save)
+    lastPersistedRef.current = save
+    if (!saved) {
+      setToasts((prev) => [
+        ...prev.slice(-3),
+        {
+          id: newId(),
+          kind: 'error',
+          title: 'Penyimpanan browser penuh',
+          message: 'Progres tetap berjalan di sesi ini, tetapi belum tersimpan. Ekspor save secara berkala.',
+        },
+      ])
     }
+    setAccounts(loadRegistry())
   }, [save, accountId])
 
   useEffect(() => {
@@ -356,13 +368,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const resetProgress = useCallback(() => {
     if (!accountId) return
     const fresh = resetSave(accountId)
-    fresh.onboarded = true
+    const saved = persistSave(accountId, fresh)
+    lastPersistedRef.current = fresh
     commit(fresh)
-    persistSave(accountId, fresh)
     setAccounts(loadRegistry())
     setToasts([])
     setCelebrations([])
-    notify('info', 'Progres direset', 'Petualangan dimulai lagi dari awal. Badge dan XP dikosongkan.')
+    notify(
+      saved ? 'info' : 'error',
+      saved ? 'Progres direset' : 'Reset belum tersimpan',
+      saved
+        ? 'Petualangan dimulai lagi dari awal. Badge dan XP dikosongkan.'
+        : 'Progres dikosongkan untuk sesi ini, tetapi browser menolak menyimpan. Coba ekspor save.',
+    )
   }, [accountId, commit, notify])
 
   const updateProfile = useCallback(

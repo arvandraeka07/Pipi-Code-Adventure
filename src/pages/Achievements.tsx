@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../store/GameContext'
 import { BADGES } from '../data/badges'
@@ -58,7 +58,7 @@ export default function Achievements() {
             <div className="relative flex flex-wrap items-center gap-5">
               <div className="relative">
                 <BadgeMedal badge={BADGES[0]} unlocked size={92} showLock={false} />
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-2 py-0.5 font-display text-[10px] font-extrabold shadow-pop-sm">
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-surface px-2 py-0.5 font-display text-[10px] font-extrabold shadow-pop-sm">
                   {unlocked.length}/{BADGES.length}
                 </span>
               </div>
@@ -81,7 +81,7 @@ export default function Achievements() {
           </Card>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex gap-1.5 rounded-2xl border-2 border-ink/10 bg-white/60 p-1">
+            <div className="flex gap-1.5 rounded-2xl border-2 border-ink/10 bg-surface/60 p-1">
               {([
                 { id: 'all', label: 'Semua', count: BADGES.length },
                 { id: 'unlocked', label: 'Terbuka', count: unlocked.length },
@@ -91,8 +91,8 @@ export default function Achievements() {
                   key={tab.id}
                   onClick={() => setFilter(tab.id)}
                   className={cn(
-                    'rounded-xl px-3 py-1.5 font-display text-[11px] font-extrabold transition',
-                    filter === tab.id ? 'bg-ink text-white shadow-pop-sm' : 'text-ink/55 hover:bg-white',
+                    'min-h-11 rounded-xl px-3 py-1.5 font-display text-[11px] font-extrabold transition',
+                    filter === tab.id ? 'bg-sun text-ink shadow-pop-sm' : 'text-ink/55 hover:bg-surface',
                   )}
                 >
                   {tab.label} <span className="opacity-60">{tab.count}</span>
@@ -120,8 +120,8 @@ export default function Achievements() {
                   className={cn(
                     'group rounded-2xl border-[3px] p-3 text-center transition',
                     isUnlocked
-                      ? 'border-ink bg-white shadow-pop-sm hover:-translate-y-1 hover:shadow-pop'
-                      : 'border-ink/15 bg-white/45 hover:border-ink/30 hover:bg-white/70',
+                      ? 'border-ink bg-surface shadow-pop-sm hover:-translate-y-1 hover:shadow-pop'
+                      : 'border-ink/15 bg-surface/45 hover:border-ink/30 hover:bg-surface/70',
                   )}
                 >
                   <BadgeMedal badge={badge} unlocked={isUnlocked} size={66} className="mx-auto" />
@@ -156,14 +156,14 @@ export default function Achievements() {
                     key={evo.stage}
                     className={cn(
                       'relative rounded-2xl border-[3px] p-2 text-center',
-                      evo.unlocked ? 'border-ink bg-white shadow-pop-sm' : 'border-ink/10 bg-white/40',
+                      evo.unlocked ? 'border-ink bg-surface shadow-pop-sm' : 'border-ink/10 bg-surface/40',
                     )}
                   >
                     {isCurrent && (
                       <span className="absolute left-1/2 top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-sun px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wide">Sekarang</span>
                     )}
                     <div className={cn('mx-auto mt-2 w-fit', !evo.unlocked && 'opacity-40 grayscale')}>
-                      <Pipi stage={evo.stage} size={78} mood={evo.unlocked ? 'happy' : 'neutral'} />
+                      <Pipi stage={evo.stage} size={78} mood={evo.unlocked ? 'happy' : 'neutral'} accessory={false} />
                     </div>
                     <div className="mt-1 font-display text-[11px] font-extrabold leading-tight">{evo.name}</div>
                     {evo.unlocked ? (
@@ -197,7 +197,7 @@ export default function Achievements() {
                 { icon: 'bug', label: 'Bug ditemukan', value: ctx.bugsFound },
                 { icon: 'puzzle', label: 'Puzzle selesai', value: ctx.puzzlesSolved },
               ].map((row) => (
-                <div key={row.label} className="flex items-center gap-2 rounded-lg border-2 border-ink/5 bg-white/60 px-2 py-1">
+                <div key={row.label} className="flex items-center gap-2 rounded-lg border-2 border-ink/5 bg-surface/60 px-2 py-1">
                   <Icon name={row.icon} size={12} className="text-ink/40" />
                   <span className="flex-1 text-[10px] font-bold text-ink/50">{row.label}</span>
                   <span className="font-mono text-[10px] font-bold">{row.value}</span>
@@ -213,7 +213,7 @@ export default function Achievements() {
             ) : (
               <div className="mt-2 space-y-2">
                 {nextUp.map(({ badge, progress, ratio }) => (
-                  <button key={badge.id} onClick={() => setSelected(badge.id)} className="flex w-full items-center gap-2 rounded-xl border-2 border-ink/10 bg-white/60 p-2 text-left transition hover:bg-white">
+                  <button key={badge.id} onClick={() => setSelected(badge.id)} className="flex w-full items-center gap-2 rounded-xl border-2 border-ink/10 bg-surface/60 p-2 text-left transition hover:bg-surface">
                     <BadgeMedal badge={badge} unlocked={false} size={36} showLock={false} />
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[10px] font-extrabold">{badge.name}</div>
@@ -238,7 +238,7 @@ export default function Achievements() {
             </ul>
           </Card>
 
-          <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-white/40 p-3 text-center text-[10px] font-semibold text-ink/45">
+          <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-surface/40 p-3 text-center text-[10px] font-semibold text-ink/45">
             <Pipi mood={unlocked.length > 6 ? 'celebrate' : 'happy'} size={64} className="mx-auto" />
             {unlocked.length > 6 ? 'Koleksimu makin lengkap. Teruskan!' : 'Setiap badge adalah bukti usaha kecil yang kamu lakukan.'}
           </div>
@@ -254,7 +254,7 @@ export default function Achievements() {
               {active.isUnlocked && <Chip icon="check" color="#159A55">Terbuka</Chip>}
             </div>
             <p className="mt-3 text-sm font-semibold leading-relaxed text-ink/65">{active.badge.description}</p>
-            <div className="mt-3 rounded-xl border-2 border-ink/10 bg-white/70 p-2.5 text-left">
+            <div className="mt-3 rounded-xl border-2 border-ink/10 bg-surface/70 p-2.5 text-left">
               <div className="text-[9px] font-extrabold uppercase tracking-wide text-ink/35">Cara mendapatkan</div>
               <p className="mt-0.5 text-[11px] font-bold text-ink/60">{active.badge.requirement}</p>
               {active.progress && (

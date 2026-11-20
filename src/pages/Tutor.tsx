@@ -41,7 +41,7 @@ function TypingBubble() {
       <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-ink bg-mint">
         <Pipi mood="thinking" size={34} />
       </span>
-      <div className="mt-1 flex items-center gap-1 rounded-2xl rounded-tl-md border-2 border-ink/10 bg-white px-3 py-2">
+      <div className="mt-1 flex items-center gap-1 rounded-2xl rounded-tl-md border-2 border-ink/10 bg-surface px-3 py-2">
         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink/40 [animation-delay:-0.2s]" />
         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink/40 [animation-delay:-0.1s]" />
         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink/40" />
@@ -142,7 +142,7 @@ export default function Tutor() {
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <Card className="flex h-[calc(100vh-190px)] min-h-[480px] flex-col overflow-hidden p-0" tone="paper">
           <div className="flex items-center gap-2 border-b-[3px] border-ink/10 bg-mint/50 px-3 py-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-white">
+            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-ink bg-surface">
               <Pipi mood={busy ? 'thinking' : 'happy'} size={38} />
             </span>
             <div className="min-w-0 flex-1">
@@ -152,7 +152,7 @@ export default function Tutor() {
                 {busy ? 'sedang berpikir...' : 'siap membantu belajar Python'}
               </div>
             </div>
-            <span className="hidden rounded-full border-2 border-ink/10 bg-white/70 px-2 py-0.5 text-[9px] font-bold text-ink/40 sm:block">
+            <span className="hidden rounded-full border-2 border-ink/10 bg-surface/70 px-2 py-0.5 text-[9px] font-bold text-ink/40 sm:block">
               Level {level}
             </span>
           </div>
@@ -171,7 +171,7 @@ export default function Tutor() {
                     <button
                       key={prompt}
                       onClick={() => void send(prompt)}
-                      className="rounded-full border-2 border-ink/15 bg-white px-2.5 py-1 text-[10px] font-extrabold text-ink/65 transition hover:border-ink/30 hover:bg-sun/40"
+                      className="min-h-11 rounded-full border-2 border-ink/15 bg-surface px-3 py-1 text-[10px] font-extrabold text-ink/65 transition hover:border-ink/30 hover:bg-sun/40"
                     >
                       {prompt}
                     </button>
@@ -197,12 +197,12 @@ export default function Tutor() {
                     className={cn(
                       'max-w-[85%] rounded-2xl border-2 px-3 py-2 text-[12px] font-semibold leading-relaxed shadow-sm sm:max-w-[78%]',
                       mine
-                        ? 'rounded-tr-md border-ink bg-ink text-white'
-                        : 'rounded-tl-md border-ink/10 bg-white text-ink',
+                        ? 'rounded-tr-md border-ink bg-leaf text-white'
+                        : 'rounded-tl-md border-ink/10 bg-surface text-ink',
                     )}
                   >
                     {mine ? <p className="whitespace-pre-wrap break-words">{message.text}</p> : <MessageBody text={message.text} />}
-                    <div className={cn('mt-1 text-right text-[8px] font-bold', mine ? 'text-white/40' : 'text-ink/30')}>
+                    <div className={cn('mt-1 text-right text-[8px] font-bold', mine ? 'text-white/60' : 'text-ink/30')}>
                       {new Date(message.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
@@ -213,7 +213,7 @@ export default function Tutor() {
             {busy && <TypingBubble />}
           </div>
 
-          <div className="border-t-[3px] border-ink/10 bg-white/60 p-2.5">
+          <div className="border-t-[3px] border-ink/10 bg-surface/60 p-2.5">
             <div className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
@@ -222,7 +222,7 @@ export default function Tutor() {
                 onKeyDown={onKeyDown}
                 rows={2}
                 placeholder="Tulis pertanyaanmu... (Enter untuk kirim, Shift+Enter baris baru)"
-                className="max-h-32 min-h-[46px] flex-1 resize-y rounded-xl border-2 border-ink/20 bg-white px-3 py-2 text-[12px] font-semibold text-ink outline-none transition placeholder:text-ink/30 focus:border-leaf"
+                className="max-h-32 min-h-[46px] flex-1 resize-y rounded-xl border-2 border-ink/20 bg-surface px-3 py-2 text-[12px] font-semibold text-ink outline-none transition placeholder:text-ink/30 focus:border-leaf"
                 aria-label="Pesan untuk Pipi Tutor"
               />
               <Button icon="send" onClick={() => void send()} disabled={busy || !input.trim()} className="h-[46px]">
@@ -248,7 +248,7 @@ export default function Tutor() {
                   key={prompt}
                   onClick={() => void send(prompt)}
                   disabled={busy}
-                  className="flex w-full items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-white/70 px-2.5 py-1.5 text-left text-[10px] font-bold text-ink/60 transition hover:border-ink/25 hover:bg-white disabled:opacity-50"
+                  className="flex min-h-11 w-full items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-surface/70 px-2.5 py-1.5 text-left text-[10px] font-bold text-ink/60 transition hover:border-ink/25 hover:bg-surface disabled:opacity-50"
                 >
                   <Icon name="arrow-right" size={11} className="shrink-0 text-leafDark" />
                   {prompt}
@@ -281,7 +281,7 @@ export default function Tutor() {
           </Card>
 
           {!TUTOR_ENDPOINT && (
-            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-white/40 p-3 text-[10px] font-semibold leading-snug text-ink/45">
+            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-surface/40 p-3 text-[10px] font-semibold leading-snug text-ink/45">
               <Icon name="info" size={12} className="mb-1" />
               Mode lokal aktif. Untuk jawaban yang lebih luas, hubungkan backend melalui variabel lingkungan
               <code className="mx-1 rounded bg-ink/5 px-1 font-mono">VITE_TUTOR_ENDPOINT</code>

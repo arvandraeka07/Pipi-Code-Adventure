@@ -12,7 +12,7 @@ export const world6: World = {
   description:
     'Kelola banyak data sekaligus dengan list, tuple, dictionary, dan set, lalu manipulasi seperti petualang data sungguhan.',
   icon: 'database',
-  palette: { from: '#FFB86B', to: '#D97706', accent: '#8266E6', soft: '#FFF0DC' },
+  palette: { from: '#ED9A5C', to: '#B95A20', accent: '#2FAE8F', soft: '#FFEBDD' },
   reward: { xp: 190, coins: 95, badge: 'data-wrangler' },
   levels: [
     {
@@ -179,13 +179,13 @@ export const world6: World = {
       },
       challenge: {
         prompt:
-          'Diberikan angka = [1, 2, 2, 3, 3, 3]: buat set unik dari list tersebut, buat tuple koordinat = (10, 20), lalu unpack menjadi x dan y. Jangan cetak apa pun.',
-        starter: 'angka = [1, 2, 2, 3, 3, 3]\nunik = ?\nkoordinat = ?\nx, y = ?\n',
-        hint: 'Gunakan set(angka), koordinat = (10, 20), lalu x, y = koordinat.',
-        solution: 'angka = [1, 2, 2, 3, 3, 3]\nunik = set(angka)\nkoordinat = (10, 20)\nx, y = koordinat',
+          'Diberikan angka = [1, 2, 2, 3, 3, 3]: ubah menjadi set unik, lalu buat tuple koordinat berisi 10 dan 20. Jangan cetak apa pun.',
+        starter: 'angka = [1, 2, 2, 3, 3, 3]\nunik = ?\nkoordinat = ?\n',
+        hint: 'Gunakan set(angka) untuk menghapus duplikat. Tuple ditulis dengan tanda kurung: (10, 20).',
+        solution: 'angka = [1, 2, 2, 3, 3, 3]\nunik = set(angka)\nkoordinat = (10, 20)',
         check: 'tests',
         tests:
-          'assert isinstance(unik, set), "unik harus set"\nassert unik == {1, 2, 3}, "set harus berisi 1,2,3"\nassert koordinat == (10, 20), "koordinat salah"\nassert x == 10 and y == 20, "unpacking salah"\nprint("PIPI_PASS")',
+          'assert isinstance(unik, set), "unik harus set"\nassert unik == {1, 2, 3}, "set harus berisi 1,2,3"\nassert koordinat == (10, 20), "koordinat salah"\nprint("PIPI_PASS")',
       },
       quiz: [
         {
@@ -385,13 +385,13 @@ export const world6: World = {
       },
       challenge: {
         prompt:
-          'Diberikan angka = [3, 8, 1, 10, 5]. Buat variabel total = jumlah semua angka, terbesar = nilai maksimum, dan genap = list berisi angka genap dengan list comprehension. Jangan cetak.',
-        starter: 'angka = [3, 8, 1, 10, 5]\ntotal = ?\nterbesar = ?\ngenap = ?\n',
-        hint: 'Gunakan sum(angka), max(angka), dan [n for n in angka if n % 2 == 0].',
-        solution: 'angka = [3, 8, 1, 10, 5]\ntotal = sum(angka)\nterbesar = max(angka)\ngenap = [n for n in angka if n % 2 == 0]',
+          'Diberikan angka = [3, 8, 1, 10, 5]. Simpan jumlah semua angka ke variabel total, dan angka terbesar ke variabel terbesar. Jangan cetak.',
+        starter: 'angka = [3, 8, 1, 10, 5]\ntotal = ?\nterbesar = ?\n',
+        hint: 'Gunakan sum(angka) untuk menjumlahkan dan max(angka) untuk mencari yang terbesar.',
+        solution: 'angka = [3, 8, 1, 10, 5]\ntotal = sum(angka)\nterbesar = max(angka)',
         check: 'tests',
         tests:
-          'assert total == 27, "total harus 27"\nassert terbesar == 10, "terbesar harus 10"\nassert genap == [8, 10], "genap harus [8, 10]"\nprint("PIPI_PASS")',
+          'assert total == 27, "total harus 27"\nassert terbesar == 10, "terbesar harus 10"\nprint("PIPI_PASS")',
       },
       quiz: [
         {

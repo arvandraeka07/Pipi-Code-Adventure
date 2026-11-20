@@ -12,7 +12,7 @@ export const world2: World = {
   description:
     'Pelajari variabel, tipe data, string, angka, boolean, dan cara menerima input dari pengguna.',
   icon: 'variable',
-  palette: { from: '#7ED957', to: '#3E9B4F', accent: '#FFC93C', soft: '#E9F9D8' },
+  palette: { from: '#F4C15B', to: '#D98A18', accent: '#E85B48', soft: '#FFF1D6' },
   reward: { xp: 150, coins: 75, badge: 'python-adventurer' },
   levels: [
     {

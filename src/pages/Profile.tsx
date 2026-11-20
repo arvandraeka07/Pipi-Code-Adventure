@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../store/GameContext'
-import { AVATARS, downloadSave } from '../lib/storage'
-import { AVATAR_META, Avatar } from '../components/Avatar'
+import { downloadSave } from '../lib/storage'
+import { Avatar, AvatarPicker } from '../components/Avatar'
 import { evolutionState, friendlyDate, levelProgress, nextEvolution, shortDate } from '../lib/game'
 import { badgeById } from '../data/badges'
 import { reputationTitle } from '../data/games'
@@ -95,7 +95,7 @@ export default function Profile() {
           <Card tone="cream" className="relative overflow-hidden p-5">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-grape/15" />
             <div className="relative flex flex-wrap items-center gap-4">
-              <Avatar avatar={avatar} size={92} />
+              <Pipi avatarOverride={avatar} stage={evolution} mood="happy" size={96} interactive className="drop-shadow-[0_8px_0_rgba(18,59,42,0.12)]" />
               <div className="min-w-[180px] flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="font-display text-2xl font-extrabold leading-tight">{save.profile.name}</h2>
@@ -127,34 +127,18 @@ export default function Profile() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={24}
-                  className="w-full rounded-xl border-2 border-ink/20 bg-white px-3 py-2 font-display text-sm font-bold outline-none transition focus:border-leaf"
+                  className="w-full rounded-xl border-2 border-ink/20 bg-surface px-3 py-2 font-display text-sm font-bold outline-none transition focus:border-leaf"
                   placeholder="Nama petualang"
                 />
                 <span className="mt-0.5 block text-[9px] font-semibold text-ink/35">Maksimal 24 karakter.</span>
               </label>
               <div>
                 <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-ink/40">Avatar</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {AVATARS.map((a) => (
-                    <button
-                      key={a}
-                      onClick={() => setAvatar(a)}
-                      className={cn(
-                        'rounded-full border-[3px] p-0.5 transition',
-                        avatar === a ? 'border-ink bg-sun shadow-pop-sm' : 'border-transparent hover:border-ink/15',
-                      )}
-                      title={AVATAR_META[a]?.label ?? a}
-                      aria-label={`Pilih avatar ${AVATAR_META[a]?.label ?? a}`}
-                      aria-pressed={avatar === a}
-                    >
-                      <Avatar avatar={a} size={38} ring={false} />
-                    </button>
-                  ))}
-                </div>
+                <AvatarPicker value={avatar} onChange={setAvatar} compact />
               </div>
             </div>
             {dirty && (
-              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border-2 border-sun/50 bg-[#FFF8DF] px-2.5 py-1.5">
+              <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border-2 border-sun/50 bg-warning-soft px-2.5 py-1.5">
                 <span className="text-[10px] font-bold text-ink/55">Ada perubahan yang belum disimpan.</span>
                 <div className="flex gap-1.5">
                   <Button size="sm" variant="ghost" onClick={() => { setName(save.profile.name); setAvatar(save.profile.avatar) }}>Batal</Button>
@@ -179,13 +163,13 @@ export default function Profile() {
           <Card className="p-4">
             <SectionHeading eyebrow="Aktivitas" title="Jejak terakhir" subtitle="Hadiah yang kamu terima dalam 40 aktivitas terakhir." className="mb-3" />
             {save.activity.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-ink/10 bg-white/40 p-4 text-center text-[11px] font-semibold text-ink/40">
+              <div className="rounded-xl border-2 border-dashed border-ink/10 bg-surface/40 p-4 text-center text-[11px] font-semibold text-ink/40">
                 Belum ada aktivitas. Selesaikan satu materi atau jalankan kode pertamamu.
               </div>
             ) : (
               <div className="space-y-1.5">
                 {save.activity.slice(0, 8).map((item, i) => (
-                  <div key={`${item.at}-${i}`} className="flex items-center gap-2 rounded-xl border-2 border-ink/5 bg-white/60 px-2.5 py-1.5">
+                  <div key={`${item.at}-${i}`} className="flex items-center gap-2 rounded-xl border-2 border-ink/5 bg-surface/60 px-2.5 py-1.5">
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-ink/10 bg-mint">
                       <Icon name={item.xp > 0 ? 'bolt' : 'coin'} size={11} />
                     </span>
@@ -224,7 +208,7 @@ export default function Profile() {
             </div>
             <div className="mt-2 grid grid-cols-4 gap-1">
               {evolutions.map((evo) => (
-                <div key={evo.stage} className={cn('rounded-lg border-2 p-1 text-center', evo.unlocked ? 'border-leaf/40 bg-white/70' : 'border-ink/10 bg-white/30 opacity-55')}>
+                <div key={evo.stage} className={cn('rounded-lg border-2 p-1 text-center', evo.unlocked ? 'border-leaf/40 bg-surface/70' : 'border-ink/10 bg-surface/30 opacity-55')}>
                   <div className="text-[8px] font-extrabold capitalize text-ink/60">{evo.stage}</div>
                   {evo.unlocked ? <Icon name="check" size={10} className="mx-auto text-leafDark" /> : <Icon name="lock" size={10} className="mx-auto text-ink/30" />}
                 </div>
@@ -245,7 +229,7 @@ export default function Profile() {
                   const badge = badgeById(id)
                   if (!badge) return null
                   return (
-                    <div key={id} className="rounded-xl border-2 border-ink/10 bg-white/70 p-1.5 text-center" title={`${badge.name} • ${friendlyDate(at)}`}>
+                    <div key={id} className="rounded-xl border-2 border-ink/10 bg-surface/70 p-1.5 text-center" title={`${badge.name} • ${friendlyDate(at)}`}>
                       <BadgeMedal badge={badge} unlocked size={44} className="mx-auto" showLock={false} />
                       <div className="mt-0.5 truncate text-[8px] font-extrabold text-ink/60">{badge.name}</div>
                     </div>
@@ -264,7 +248,7 @@ export default function Profile() {
               {accounts.map((account) => {
                 const active = account.id === accountId
                 return (
-                  <div key={account.id} className={cn('flex items-center gap-2 rounded-xl border-2 px-2 py-1.5', active ? 'border-ink bg-sun/30' : 'border-ink/10 bg-white/60')}>
+                  <div key={account.id} className={cn('flex items-center gap-2 rounded-xl border-2 px-2 py-1.5', active ? 'border-ink bg-sun/30' : 'border-ink/10 bg-surface/60')}>
                     <Avatar avatar={account.avatar} size={30} ring={false} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1 truncate text-[10px] font-extrabold">
@@ -274,11 +258,11 @@ export default function Profile() {
                       <div className="text-[8px] font-bold text-ink/35">Level {levelProgress(account.xp).level} • {account.xp} XP</div>
                     </div>
                     {!active && (
-                      <button onClick={() => switchProfile(account.id)} className="rounded-md border border-ink/15 bg-white px-1.5 py-0.5 text-[8px] font-extrabold hover:bg-mint" aria-label={`Ganti ke ${account.name}`}>
+                      <button onClick={() => switchProfile(account.id)} className="rounded-md border border-ink/15 bg-surface px-1.5 py-0.5 text-[8px] font-extrabold hover:bg-mint" aria-label={`Ganti ke ${account.name}`}>
                         Pakai
                       </button>
                     )}
-                    <button onClick={() => setRemoveTarget(account.id)} className="grid h-6 w-6 place-items-center rounded-md text-ink/30 hover:bg-coral/20 hover:text-coral" aria-label={`Hapus ${account.name}`}>
+                    <button onClick={() => setRemoveTarget(account.id)} className="grid h-11 w-11 place-items-center rounded-md text-ink/30 hover:bg-coral/20 hover:text-coral-text" aria-label={`Hapus ${account.name}`}>
                       <Icon name="trash" size={11} />
                     </button>
                   </div>
@@ -303,6 +287,7 @@ export default function Profile() {
               ref={fileRef}
               type="file"
               accept="application/json,.json"
+              aria-label="Pilih file cadangan JSON"
               className="hidden"
               onChange={(e) => void importData(e.target.files?.[0])}
             />
@@ -331,26 +316,15 @@ export default function Profile() {
             onChange={(e) => setNewName(e.target.value)}
             maxLength={24}
             autoFocus
-            className="w-full rounded-xl border-2 border-ink/20 bg-white px-3 py-2 font-display text-sm font-bold outline-none focus:border-leaf"
+            className="w-full rounded-xl border-2 border-ink/20 bg-surface px-3 py-2 font-display text-sm font-bold outline-none focus:border-leaf"
             placeholder="Contoh: Andra"
           />
         </label>
         <div className="mt-3">
           <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-ink/40">Avatar</span>
-          <div className="flex flex-wrap gap-1.5">
-            {AVATARS.map((a) => (
-              <button
-                key={a}
-                onClick={() => setNewAvatar(a)}
-                className={cn('rounded-full border-[3px] p-0.5', newAvatar === a ? 'border-ink bg-sun' : 'border-transparent')}
-                aria-label={`Avatar ${AVATAR_META[a]?.label ?? a}`}
-              >
-                <Avatar avatar={a} size={36} ring={false} />
-              </button>
-            ))}
-          </div>
+          <AvatarPicker value={newAvatar} onChange={setNewAvatar} />
         </div>
-        <p className="mt-3 rounded-xl border-2 border-ink/10 bg-white/60 p-2 text-[10px] font-semibold text-ink/50">
+        <p className="mt-3 rounded-xl border-2 border-ink/10 bg-surface/60 p-2 text-[10px] font-semibold text-ink/50">
           Profil baru mulai dari nol. Profil lain tetap tersimpan di perangkat ini.
         </p>
       </Modal>

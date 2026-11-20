@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useGame } from '../store/GameContext'
 import { WORLDS, getWorld } from '../data/worlds'
@@ -58,7 +59,15 @@ export default function WorldMap() {
       </div>
 
       <Card className="relative mb-5 overflow-hidden">
-        <div className="relative p-4 sm:p-6" style={{ background: `linear-gradient(135deg, ${world.palette.soft}, #FFFEF8 65%)` }}>
+        <div
+          className="world-tint relative p-4 sm:p-6"
+          style={
+            {
+              '--tint-soft': world.palette.soft,
+              '--tint-accent': world.palette.accent,
+            } as CSSProperties
+          }
+        >
           <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full border-[3px] border-dashed border-ink/10" />
           <div className="relative flex flex-wrap items-start gap-4">
             <span className="grid h-16 w-16 shrink-0 place-items-center rounded-[22px] border-[3px] border-ink shadow-pop-sm" style={{ backgroundColor: world.palette.accent }}>
@@ -88,10 +97,10 @@ export default function WorldMap() {
                     <Button size="sm" variant="secondary" icon="sword">Latihan ulang boss</Button>
                   </Link>
                 )}
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
+                <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
                   <Icon name="bolt" size={12} className="text-sunDark" /> +{world.reward.xp} XP dunia
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
+                <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
                   <Icon name="coin" size={12} className="text-sunDark" /> +{world.reward.coins} koin
                 </span>
               </div>
@@ -118,7 +127,7 @@ export default function WorldMap() {
                 <div
                   className={cn(
                     'relative flex items-start gap-3 rounded-[22px] border-[3px] p-3.5 transition',
-                    done ? 'border-leaf/40 bg-[#F3FFF7]' : isNext ? 'border-ink bg-paper shadow-pop' : open ? 'border-ink/10 bg-white/60' : 'border-ink/10 bg-[#F2F1EA]/80 opacity-60',
+                    done ? 'border-leaf/40 bg-success-soft' : isNext ? 'border-ink bg-paper shadow-pop' : open ? 'border-ink/10 bg-surface/60' : 'border-ink/10 bg-ink/10/80 opacity-60',
                     open && 'hover:-translate-y-0.5',
                   )}
                 >
@@ -129,7 +138,7 @@ export default function WorldMap() {
                     )}
                   >
                     <Icon name={done ? 'check' : open ? level.icon : 'lock'} size={18} />
-                    <span className="absolute -left-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full border-2 border-ink bg-white font-display text-[8px] font-extrabold">
+                    <span className="absolute -left-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full border-2 border-ink bg-surface font-display text-[8px] font-extrabold">
                       {i + 1}
                     </span>
                   </span>
@@ -170,12 +179,14 @@ export default function WorldMap() {
           <div className="mt-5">
             <Card className={cn('relative overflow-hidden', bossUnlocked && !bossDefeated ? 'border-ink' : '')}>
               <div
-                className="relative p-4"
-                style={{
-                  background: bossDefeated
-                    ? 'linear-gradient(135deg, #D8F7E4, #FFFEF8)'
-                    : `linear-gradient(135deg, ${world.palette.soft}, #FFF1EC)`,
-                }}
+                className="world-tint-boss relative p-4"
+                style={
+                  {
+                    '--tint-soft': bossDefeated ? '#D8F7E4' : world.palette.soft,
+                    '--tint-end': bossDefeated ? '#FFFEF8' : '#FFF1EC',
+                    '--tint-accent': bossDefeated ? '#2FAE8F' : '#E85B48',
+                  } as CSSProperties
+                }
               >
                 <div className="flex flex-wrap items-start gap-3">
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-ink bg-coral">
@@ -187,7 +198,7 @@ export default function WorldMap() {
                     <p className="text-[11px] font-bold text-ink/50">{world.boss.title}</p>
                     <p className="mt-1 text-[11px] font-semibold leading-snug text-ink/60">{world.boss.description}</p>
                   </div>
-                  <div className="rounded-xl border-2 border-ink/15 bg-white/70 px-2.5 py-1.5 text-center">
+                  <div className="rounded-xl border-2 border-ink/15 bg-surface/70 px-2.5 py-1.5 text-center">
                     <div className="font-display text-sm font-extrabold">{bossDefeated ? '0' : world.boss.hp}</div>
                     <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/40">HP boss</div>
                   </div>
@@ -198,14 +209,14 @@ export default function WorldMap() {
                   ) : bossUnlocked ? (
                     <Link to={`/boss/${world.id}`}><Button size="sm" variant="danger" icon="sword">Mulai Boss Battle</Button></Link>
                   ) : (
-                    <div className="inline-flex items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-white/70 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
+                    <div className="inline-flex items-center gap-1.5 rounded-xl border-2 border-ink/10 bg-surface/70 px-2.5 py-1.5 text-[10px] font-bold text-ink/50">
                       <Icon name="lock" size={12} /> Selesaikan semua misi untuk membuka boss
                     </div>
                   )}
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-[10px] font-extrabold text-ink/50">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-surface/60 px-2 py-1 text-[10px] font-extrabold text-ink/50">
                     <Icon name="bolt" size={11} /> +{world.boss.reward.xp} XP
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-[10px] font-extrabold text-ink/50">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-surface/60 px-2 py-1 text-[10px] font-extrabold text-ink/50">
                     <Icon name="coin" size={11} /> +{world.boss.reward.coins}
                   </span>
                 </div>
@@ -240,7 +251,7 @@ export default function WorldMap() {
                   href={s.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="flex items-center gap-1.5 rounded-lg border-2 border-ink/10 bg-white/60 px-2 py-1.5 text-[10px] font-bold text-ink/60 hover:border-ink/25 hover:text-ink"
+                  className="flex items-center gap-1.5 rounded-lg border-2 border-ink/10 bg-surface/60 px-2 py-1.5 text-[10px] font-bold text-ink/60 hover:border-ink/25 hover:text-ink"
                 >
                   <Icon name="book" size={11} className="shrink-0" />
                   <span className="flex-1 truncate">{s.label}</span>

@@ -4,13 +4,13 @@ import { Icon } from './Icon'
 import { cn } from './ui'
 
 const TONES: Record<ToastItem['kind'], { bg: string; icon: string; iconBg: string }> = {
-  xp: { bg: 'bg-[#F3FFE9]', icon: 'bolt', iconBg: 'bg-sun' },
-  coin: { bg: 'bg-[#FFF8E2]', icon: 'coin', iconBg: 'bg-sun' },
-  level: { bg: 'bg-[#FFF4CC]', icon: 'star', iconBg: 'bg-sun' },
-  badge: { bg: 'bg-[#F4EEFF]', icon: 'trophy', iconBg: 'bg-grape' },
-  info: { bg: 'bg-white', icon: 'info', iconBg: 'bg-sky' },
-  error: { bg: 'bg-[#FFF0ED]', icon: 'alert', iconBg: 'bg-coral' },
-  boss: { bg: 'bg-[#FFEDE8]', icon: 'sword', iconBg: 'bg-coral' },
+  xp: { bg: 'bg-success-soft', icon: 'bolt', iconBg: 'bg-sun' },
+  coin: { bg: 'bg-warning-soft', icon: 'coin', iconBg: 'bg-sun' },
+  level: { bg: 'bg-warning-soft', icon: 'star', iconBg: 'bg-sun' },
+  badge: { bg: 'bg-grape-soft', icon: 'trophy', iconBg: 'bg-grape' },
+  info: { bg: 'bg-surface', icon: 'info', iconBg: 'bg-sky' },
+  error: { bg: 'bg-danger-soft', icon: 'alert', iconBg: 'bg-coral' },
+  boss: { bg: 'bg-danger-soft', icon: 'sword', iconBg: 'bg-coral' },
 }
 
 function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: string) => void }) {

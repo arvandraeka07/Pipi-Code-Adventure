@@ -64,7 +64,7 @@ export default function BossBattle() {
       <div>
         <PageHeader title={`Boss: ${boss.name}`} subtitle={world.name} icon="sword" />
         <Card tone="cream" className="mx-auto max-w-2xl overflow-hidden p-6 text-center">
-          <div className="mx-auto grid h-24 w-24 place-items-center rounded-3xl border-[3px] border-ink bg-white/60">
+          <div className="mx-auto grid h-24 w-24 place-items-center rounded-3xl border-[3px] border-ink bg-surface/60">
             <Icon name="lock" size={42} className="text-ink/30" />
           </div>
           <h2 className="mt-3 font-display text-xl font-extrabold">Boss masih terkunci</h2>
@@ -167,7 +167,7 @@ export default function BossBattle() {
         <Card tone="cream" className="relative mx-auto max-w-2xl overflow-hidden p-6 text-center">
           <Confetti count={54} />
           <div className="relative">
-            <Pipi mood="celebrate" stage={evolution} size={160} className="mx-auto" sparkle />
+            <Pipi mood="celebrate" stage={evolution} size={160} className="mx-auto" />
             <div className="mt-1 flex items-center justify-center gap-2">
               <Chip icon="sword" color={world.palette.accent}>{boss.name} tumbang</Chip>
               <Chip icon="flag" color="#159A55">{world.name} tuntas</Chip>
@@ -181,10 +181,10 @@ export default function BossBattle() {
                 : `Kamu menaklukkan ${boss.name} lagi. Hadiah dunia hanya diberikan sekali, tetapi latihan ini tetap melatih pemahamanmu.`}
             </p>
             <div className="mx-auto mt-3 flex max-w-sm flex-wrap justify-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-xl border-2 border-ink/10 bg-white/70 px-3 py-1.5 text-xs font-extrabold">
+              <span className="inline-flex items-center gap-1 rounded-xl border-2 border-ink/10 bg-surface/70 px-3 py-1.5 text-xs font-extrabold">
                 <Icon name="bolt" size={14} className="text-sunDark" /> +{summary?.xp ?? 0} XP
               </span>
-              <span className="inline-flex items-center gap-1 rounded-xl border-2 border-ink/10 bg-white/70 px-3 py-1.5 text-xs font-extrabold">
+              <span className="inline-flex items-center gap-1 rounded-xl border-2 border-ink/10 bg-surface/70 px-3 py-1.5 text-xs font-extrabold">
                 <Icon name="coin" size={14} className="text-sunDark" /> +{summary?.coins ?? 0} koin
               </span>
               {summary?.leveledUp && <Chip icon="star" color="#FFC93C">Level {summary.leveledTo}</Chip>}
@@ -250,7 +250,7 @@ export default function BossBattle() {
                 <div className="text-[10px] font-bold text-ink/40">Tulis solusi, lalu periksa.</div>
               </div>
             </div>
-            <p className="mt-2 rounded-xl border-2 border-ink/10 bg-white/60 p-2.5 text-[11px] font-semibold leading-relaxed text-ink/65">
+            <p className="mt-2 rounded-xl border-2 border-ink/10 bg-surface/60 p-2.5 text-[11px] font-semibold leading-relaxed text-ink/65">
               {challenge.prompt}
             </p>
             <div className="mt-2">
@@ -266,19 +266,19 @@ export default function BossBattle() {
               {defeated && <Chip icon="info" color="#8266E6">Mode latihan</Chip>}
             </div>
             {showHint && (
-              <p className="mt-2 rounded-xl border-2 border-sun/40 bg-[#FFF8DF] p-2 text-[10px] font-bold leading-snug text-ink/55">
+              <p className="mt-2 rounded-xl border-2 border-sun/40 bg-warning-soft p-2 text-[10px] font-bold leading-snug text-ink/55">
                 {challenge.hint}
               </p>
             )}
             {result && (
               <div className={cn('mt-2 rounded-xl border-2 p-2.5', result.passed ? 'border-leaf/40 bg-mint/60' : 'border-coral/40 bg-coral/5')}>
                 <div className="flex items-start gap-1.5">
-                  <Icon name={result.passed ? 'check' : 'info'} size={14} className={result.passed ? 'mt-0.5 text-leafDark' : 'mt-0.5 text-coral'} />
+                  <Icon name={result.passed ? 'check' : 'info'} size={14} className={result.passed ? 'mt-0.5 text-leafDark' : 'mt-0.5 text-coral-text'} />
                   <p className="whitespace-pre-wrap text-[11px] font-bold leading-snug text-ink/65">{result.message}</p>
                 </div>
                 {result.output.trim() && (
-                  <div className="mt-1.5 rounded-lg bg-[#0F2B20] p-2">
-                    <div className="text-[8px] font-extrabold uppercase tracking-wide text-mint/40">Output</div>
+                  <div className="mt-1.5 rounded-lg bg-code p-2">
+                    <div className="text-[8px] font-extrabold uppercase tracking-wide text-code-ink/40">Output</div>
                     <pre className="mt-0.5 whitespace-pre-wrap font-mono text-[10px] leading-relaxed text-[#B9F5CE]">{result.output}</pre>
                   </div>
                 )}
@@ -288,7 +288,7 @@ export default function BossBattle() {
 
           <aside className="space-y-4">
             <Card tone="cream" className="p-4 text-center">
-              <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl border-[3px] border-ink bg-white/60">
+              <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl border-[3px] border-ink bg-surface/60">
                 <Icon name="sword" size={36} className="text-ink/60" />
               </div>
               <h3 className="mt-2 font-display text-sm font-extrabold">{boss.name}</h3>
@@ -306,7 +306,7 @@ export default function BossBattle() {
                 <li className="flex gap-1.5"><Icon name="check" size={11} className="mt-0.5 shrink-0 text-leafDark" /> Kamu boleh mencoba berkali-kali.</li>
               </ul>
             </Card>
-            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-white/40 p-3 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-surface/40 p-3 text-center">
               <Pipi mood={result?.passed ? 'celebrate' : 'hint'} size={72} className="mx-auto" />
               <p className="mt-1 text-[10px] font-semibold leading-snug text-ink/45">Tenang. Kamu sudah sampai di sini karena bisa.</p>
             </div>
@@ -384,19 +384,19 @@ export default function BossBattle() {
                         disabled={selected !== null}
                         className={cn(
                           'flex items-center gap-2 rounded-xl border-[2.5px] px-2.5 py-2 text-left text-[11px] font-bold transition',
-                          !showState && 'border-ink/15 bg-white hover:border-ink/35 hover:bg-sun/20',
+                          !showState && 'border-ink/15 bg-surface hover:border-ink/35 hover:bg-sun/20',
                           showState && isAnswer && 'border-leaf bg-mint/70',
                           showState && picked && !isAnswer && 'border-coral bg-coral/10',
-                          showState && !isAnswer && !picked && 'border-ink/10 bg-white/40 opacity-60',
+                          showState && !isAnswer && !picked && 'border-ink/10 bg-surface/40 opacity-60',
                         )}
                       >
                         <span className={cn(
                           'grid h-6 w-6 shrink-0 place-items-center rounded-md border-2 text-[10px] font-extrabold',
-                          showState && isAnswer ? 'border-leaf bg-leaf text-white' : showState && picked ? 'border-coral bg-coral text-white' : 'border-ink/20 bg-white',
+                          showState && isAnswer ? 'border-leaf bg-leaf text-white' : showState && picked ? 'border-coral bg-coral text-ink' : 'border-ink/20 bg-surface',
                         )}>
                           {showState && isAnswer ? <Icon name="check" size={12} /> : showState && picked ? <Icon name="x" size={12} /> : String.fromCharCode(65 + i)}
                         </span>
-                        <span className="min-w-0 flex-1">{option}</span>
+                        <span className="min-w-0 flex-1 whitespace-pre-line">{option}</span>
                       </button>
                     )
                   })}
@@ -405,7 +405,7 @@ export default function BossBattle() {
                 {feedback && (
                   <div className={cn('mt-3 rounded-xl border-2 p-2.5', feedback.correct ? 'border-leaf/40 bg-mint/50' : 'border-coral/40 bg-coral/5')}>
                     <div className="flex items-start gap-1.5">
-                      <Icon name={feedback.correct ? 'check' : 'info'} size={14} className={cn('mt-0.5 shrink-0', feedback.correct ? 'text-leafDark' : 'text-coral')} />
+                      <Icon name={feedback.correct ? 'check' : 'info'} size={14} className={cn('mt-0.5 shrink-0', feedback.correct ? 'text-leafDark' : 'text-coral-text')} />
                       <p className="text-[11px] font-semibold leading-relaxed text-ink/65">{feedback.text}</p>
                     </div>
                     <div className="mt-2 flex justify-end">
@@ -450,7 +450,7 @@ export default function BossBattle() {
                     key={i}
                     className={cn(
                       'h-2 flex-1 rounded-full border',
-                      i < qIndex ? 'border-leaf bg-leaf' : i === qIndex ? 'border-ink bg-sun' : 'border-ink/15 bg-white',
+                      i < qIndex ? 'border-leaf bg-leaf' : i === qIndex ? 'border-ink bg-sun' : 'border-ink/15 bg-surface',
                     )}
                   />
                 ))}
@@ -458,7 +458,7 @@ export default function BossBattle() {
               <p className="mt-1 text-[9px] font-bold text-ink/35">
                 {qIndex} dari {questions.length} soal terjawab
               </p>
-              <div className="mt-2 rounded-xl border-2 border-ink/10 bg-white/60 p-2">
+              <div className="mt-2 rounded-xl border-2 border-ink/10 bg-surface/60 p-2">
                 <div className="text-[9px] font-extrabold uppercase tracking-wide text-ink/35">Hadiah</div>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] font-extrabold text-sunDark">
                   <span className="inline-flex items-center gap-0.5"><Icon name="bolt" size={11} /> +{boss.reward.xp + world.reward.xp} XP</span>
@@ -467,7 +467,7 @@ export default function BossBattle() {
               </div>
             </Card>
 
-            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-white/40 p-3 text-[10px] font-semibold leading-snug text-ink/45">
+            <div className="rounded-2xl border-2 border-dashed border-ink/15 bg-surface/40 p-3 text-[10px] font-semibold leading-snug text-ink/45">
               <Icon name="info" size={12} className="mb-1" />
               Kamu bisa keluar kapan saja. Progres pertarungan akan dimulai dari awal saat kembali.
             </div>
@@ -489,11 +489,11 @@ export default function BossBattle() {
           <div className="flex flex-col items-center justify-center">
             <div className="relative grid h-28 w-28 place-items-center rounded-[30px] border-[3px] border-ink shadow-pop-sm" style={{ backgroundColor: world.palette.accent }}>
               <Icon name="skull" size={52} />
-              <span className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border-2 border-ink bg-white">
+              <span className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border-2 border-ink bg-surface">
                 <Icon name="flame" size={15} />
               </span>
             </div>
-            <div className="mt-2 rounded-full border-2 border-ink bg-white px-2 py-0.5 font-display text-[10px] font-extrabold shadow-pop-sm">
+            <div className="mt-2 rounded-full border-2 border-ink bg-surface px-2 py-0.5 font-display text-[10px] font-extrabold shadow-pop-sm">
               {boss.hp} HP
             </div>
           </div>
@@ -507,15 +507,15 @@ export default function BossBattle() {
             <p className="mt-2 text-xs font-semibold leading-relaxed text-ink/60">{boss.description}</p>
 
             <div className="mt-3 grid grid-cols-3 gap-1.5">
-              <div className="rounded-xl border-2 border-ink/10 bg-white/70 px-2 py-1.5 text-center">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/70 px-2 py-1.5 text-center">
                 <div className="font-display text-base font-extrabold">{questions.length}</div>
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">Soal</div>
               </div>
-              <div className="rounded-xl border-2 border-ink/10 bg-white/70 px-2 py-1.5 text-center">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/70 px-2 py-1.5 text-center">
                 <div className="font-display text-base font-extrabold">{boss.playerHp}</div>
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">Nyawa</div>
               </div>
-              <div className="rounded-xl border-2 border-ink/10 bg-white/70 px-2 py-1.5 text-center">
+              <div className="rounded-xl border-2 border-ink/10 bg-surface/70 px-2 py-1.5 text-center">
                 <div className="font-display text-base font-extrabold">{boss.reward.xp + world.reward.xp}</div>
                 <div className="text-[8px] font-extrabold uppercase tracking-wide text-ink/35">XP hadiah</div>
               </div>

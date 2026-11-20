@@ -12,7 +12,7 @@ export const world3: World = {
   description:
     'Kuasai operator aritmatika, perbandingan, operator logika, serta if, elif, dan else.',
   icon: 'scale',
-  palette: { from: '#9B8AFB', to: '#6B4EE6', accent: '#FFC93C', soft: '#EDE8FF' },
+  palette: { from: '#EB7A66', to: '#C74637', accent: '#F5B53C', soft: '#FFE4DE' },
   reward: { xp: 160, coins: 80 },
   levels: [
     {

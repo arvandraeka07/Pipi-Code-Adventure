@@ -14,7 +14,7 @@ export const world7: World = {
   description:
     'Gabungkan nested loop, manipulasi string, exception handling, file handling, dan bangun mini project pertamamu.',
   icon: 'crown',
-  palette: { from: '#F7C948', to: '#D98324', accent: '#8266E6', soft: '#FFF6D8' },
+  palette: { from: '#F5C84C', to: '#B8790F', accent: '#E85B48', soft: '#FFF4CC' },
   reward: { xp: 220, coins: 120 },
   levels: [
     {
@@ -186,14 +186,13 @@ export const world7: World = {
       },
       challenge: {
         prompt:
-          'Diberikan teks = "  belajar python  " buat: bersih = teks tanpa spasi ujung, judul = versi title-case dari bersih, kata = hasil split bersih, gabung = kata digabung dengan "-", potong = "Python" dari "Belajar Python" (pakai slicing). Jangan cetak.',
-        starter: 'teks = "  belajar python  "\nbersih = ?\njudul = ?\nkata = ?\ngabung = ?\npotong = "Belajar Python"[0:?]\n',
-        hint: 'strip(), title(), split(), "-".join(kata). "Belajar Python" indeks 0 sampai 6 menghasilkan Python (indeks 6 adalah spasi).',
-        solution:
-          'teks = "  belajar python  "\nbersih = teks.strip()\njudul = bersih.title()\nkata = bersih.split()\ngabung = "-".join(kata)\npotong = "Belajar Python"[0:6]',
+          'Diberikan teks = "  belajar python  ". Hapus spasi di awal dan akhir dengan strip(), lalu ubah menjadi "Belajar Python" dengan title(). Jangan cetak.',
+        starter: 'teks = "  belajar python  "\nbersih = ?\njudul = ?\n',
+        hint: 'Gunakan teks.strip() untuk membersihkan spasi, lalu bersih.title() untuk mengubah huruf.',
+        solution: 'teks = "  belajar python  "\nbersih = teks.strip()\njudul = bersih.title()',
         check: 'tests',
         tests:
-          'assert bersih == "belajar python", "bersih salah"\nassert judul == "Belajar Python", "judul salah"\nassert kata == ["belajar", "python"], "kata salah"\nassert gabung == "belajar-python", "gabung salah"\nassert potong == "Python", "potong harus Python"\nprint("PIPI_PASS")',
+          'assert bersih == "belajar python", "bersih salah"\nassert judul == "Belajar Python", "judul salah"\nprint("PIPI_PASS")',
       },
       quiz: [
         {

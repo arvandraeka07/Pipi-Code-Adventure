@@ -189,6 +189,23 @@ export function normalizeOutput(text: string): string {
     .replace(/\n+$/, '')
 }
 
+/**
+ * Bentuk output yang dibandingkan dengan toleransi ramah pemula:
+ * huruf besar/kecil, spasi berlebih, dan baris kosong di tepi diabaikan.
+ */
+export function comparableOutput(text: string): string {
+  return normalizeOutput(text)
+    .normalize('NFKC')
+    .split('\n')
+    .map((line) => line.trim().replace(/[ \t]+/g, ' '))
+    .join('\n')
+    .toLowerCase()
+}
+
+export function outputsMatch(actual: string, expected: string): boolean {
+  return comparableOutput(actual) === comparableOutput(expected)
+}
+
 export interface ChallengeResult {
   passed: boolean
   output: string
@@ -196,6 +213,104 @@ export interface ChallengeResult {
   message: string
   testsPassed?: number
   testsTotal?: number
+}
+
+export interface FriendlyPythonError {
+  title: string
+  hint: string
+  detail: string
+  line?: number
+}
+
+export function friendlyPythonError(error: string): FriendlyPythonError {
+  const lines = error.trim().split('\n').filter(Boolean)
+  const detail = lines[lines.length - 1] ?? 'Kode berhenti tanpa pesan error.'
+  const lineMatch = error.match(/line (\d+)/)
+  const line = lineMatch ? Number(lineMatch[1]) : undefined
+  const typeMatch = detail.match(/^([A-Za-z]+Error):?\s*(.*)$/)
+  const type = typeMatch?.[1] ?? ''
+  const rest = typeMatch?.[2] ?? ''
+
+  const map: Record<string, { title: string; hint: string }> = {
+    SyntaxError: {
+      title: 'Ada susunan kode yang belum pas',
+      hint: 'Periksa tanda kurung, titik dua `:`, tanda kutip, dan baris tepat sebelum lokasi error.',
+    },
+    IndentationError: {
+      title: 'Indentasi belum konsisten',
+      hint: 'Gunakan 4 spasi untuk setiap level dan jangan mencampur tab dengan spasi.',
+    },
+    TabError: {
+      title: 'Tab dan spasi tercampur',
+      hint: 'Ganti semua tab dengan spasi agar Python membaca blok kode dengan benar.',
+    },
+    NameError: {
+      title: 'Ada nama yang belum dikenal Python',
+      hint: 'Cek ejaan variabel atau function, dan pastikan sudah dibuat sebelum dipakai.',
+    },
+    UnboundLocalError: {
+      title: 'Variabel dipakai sebelum punya nilai',
+      hint: 'Beri nilai awal pada variabel di dalam function sebelum membacanya.',
+    },
+    TypeError: {
+      title: 'Tipe datanya belum cocok',
+      hint: 'Cek apakah kamu mencampur teks dan angka, atau memberi jumlah argumen yang salah.',
+    },
+    ValueError: {
+      title: 'Nilainya tidak sesuai yang diminta',
+      hint: 'Periksa input dan konversi seperti `int()` atau `float()`.',
+    },
+    ZeroDivisionError: {
+      title: 'Kamu membagi dengan nol',
+      hint: 'Pastikan angka pembaginya bukan 0 sebelum operasi pembagian.',
+    },
+    IndexError: {
+      title: 'Index list di luar jangkauan',
+      hint: 'Ingat index dimulai dari 0. Cek juga panjang list dengan `len()`.',
+    },
+    KeyError: {
+      title: 'Key tidak ditemukan di dictionary',
+      hint: 'Cek ejaan key atau gunakan `.get()` agar lebih aman.',
+    },
+    AttributeError: {
+      title: 'Objek tidak punya atribut atau metode itu',
+      hint: 'Cek nama metode, misalnya `append` untuk list, bukan `add`.',
+    },
+    ModuleNotFoundError: {
+      title: 'Modul belum tersedia',
+      hint: 'Cek ejaan `import`. Pyodide hanya memuat modul Python yang umum dipakai.',
+    },
+    ImportError: {
+      title: 'Import belum berhasil',
+      hint: 'Cek nama modul atau function yang kamu impor.',
+    },
+    AssertionError: {
+      title: 'Hasil belum sesuai pemeriksaan otomatis',
+      hint: 'Baca pesan pemeriksaan, lalu cek nama variabel/function dan nilai akhirnya.',
+    },
+    RecursionError: {
+      title: 'Function memanggil dirinya terlalu dalam',
+      hint: 'Pastikan ada kondisi berhenti (base case) yang benar.',
+    },
+    OverflowError: {
+      title: 'Angkanya terlalu besar untuk diproses',
+      hint: 'Kurangi ukuran angka atau pecah perhitungan menjadi bagian kecil.',
+    },
+    EOFError: {
+      title: 'Program menunggu input yang tidak tersedia',
+      hint: 'Pastikan jumlah `input()` sesuai dengan input yang diberikan.',
+    },
+  }
+
+  const entry = map[type]
+  if (entry) return { ...entry, detail: rest || detail, line }
+
+  return {
+    title: 'Kode berhenti karena error',
+    hint: 'Baca baris terakhir traceback, lalu periksa baris kode yang ditunjuk.',
+    detail,
+    line,
+  }
 }
 
 export async function checkChallenge(challenge: Challenge, code: string): Promise<ChallengeResult> {
@@ -214,23 +329,22 @@ export async function checkChallenge(challenge: Challenge, code: string): Promis
       return { passed: false, output: result.output, error: result.error, message: result.error }
     }
     if (result.error.trim()) {
-      const lastLine = result.error.trim().split('\n').slice(-1)[0]
+      const friendly = friendlyPythonError(result.error)
       return {
         passed: false,
         output: result.output,
         error: result.error,
-        message: `Kodenya error: ${lastLine}. Baca petunjuk Pipi dan coba lagi!`,
+        message: `${friendly.title}${friendly.line ? ` (baris ${friendly.line})` : ''}. ${friendly.hint}`,
       }
     }
-    const actual = normalizeOutput(result.output)
     const expected = normalizeOutput(challenge.expected ?? '')
-    const passed = actual === expected
+    const passed = outputsMatch(result.output, expected)
     return {
       passed,
       output: result.output,
       error: result.error,
       message: passed
-        ? 'Tantangan selesai! Output-mu tepat.'
+        ? 'Tantangan selesai! Output-mu tepat. Huruf besar/kecil dan spasi berlebih tidak dipermasalahkan.'
         : `Belum tepat. Output yang diharapkan:\n${expected || '(kosong)'}`,
     }
   }
@@ -242,16 +356,15 @@ export async function checkChallenge(challenge: Challenge, code: string): Promis
     return { passed: false, output: result.output, error: result.error, message: result.error }
   }
   if (result.error.trim()) {
-    const lines = result.error.trim().split('\n').filter(Boolean)
-    const assertion = lines.find((l) => l.includes('AssertionError'))
-    const lastLine = lines[lines.length - 1] ?? ''
+    const friendly = friendlyPythonError(result.error)
+    const assertion = result.error.includes('AssertionError')
     return {
       passed: false,
       output: result.output,
       error: result.error,
       message: assertion
-        ? `Hampir! ${assertion.replace(/^AssertionError:\s*/, '')}`
-        : `Kodenya error: ${lastLine}`,
+        ? `Hampir! ${friendly.detail.replace(/^AssertionError:\s*/, '')}. ${friendly.hint}`
+        : `${friendly.title}${friendly.line ? ` (baris ${friendly.line})` : ''}. ${friendly.hint}`,
     }
   }
   const passed = result.output.includes('PIPI_PASS')

@@ -20,6 +20,32 @@ function safeParse<T>(raw: string | null, fallback: T): T {
   }
 }
 
+function storageGet(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function storageSet(key: string, value: string): boolean {
+  try {
+    window.localStorage.setItem(key, value)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function storageRemove(key: string): boolean {
+  try {
+    window.localStorage.removeItem(key)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function newId(): string {
   try {
     return crypto.randomUUID()
@@ -72,21 +98,20 @@ export function createInitialSave(name: string, avatar: string): SaveState {
 }
 
 export function loadRegistry(): AccountMeta[] {
-  const data = safeParse<AccountsRegistry>(localStorage.getItem(ACCOUNTS_KEY), { accounts: [] })
+  const data = safeParse<AccountsRegistry>(storageGet(ACCOUNTS_KEY), { accounts: [] })
   return Array.isArray(data.accounts) ? data.accounts : []
 }
 
-export function saveRegistry(accounts: AccountMeta[]) {
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify({ accounts }))
+export function saveRegistry(accounts: AccountMeta[]): boolean {
+  return storageSet(ACCOUNTS_KEY, JSON.stringify({ accounts }))
 }
 
 export function getActiveId(): string | null {
-  return localStorage.getItem(ACTIVE_KEY)
+  return storageGet(ACTIVE_KEY)
 }
 
-export function setActiveId(id: string | null) {
-  if (id) localStorage.setItem(ACTIVE_KEY, id)
-  else localStorage.removeItem(ACTIVE_KEY)
+export function setActiveId(id: string | null): boolean {
+  return id ? storageSet(ACTIVE_KEY, id) : storageRemove(ACTIVE_KEY)
 }
 
 export function createAccount(name: string, avatar: string): { meta: AccountMeta; save: SaveState } {
@@ -108,7 +133,7 @@ export function createAccount(name: string, avatar: string): { meta: AccountMeta
 }
 
 export function loadSave(accountId: string): SaveState | null {
-  const raw = localStorage.getItem(SAVE_PREFIX + accountId)
+  const raw = storageGet(SAVE_PREFIX + accountId)
   if (!raw) return null
   const parsed = safeParse<Partial<SaveState> | null>(raw, null)
   if (!parsed) return null
@@ -158,8 +183,9 @@ export function normalizeDaily(save: SaveState): SaveState {
   }
 }
 
-export function persistSave(accountId: string, save: SaveState) {
-  localStorage.setItem(SAVE_PREFIX + accountId, JSON.stringify(save))
+export function persistSave(accountId: string, save: SaveState): boolean {
+  const saved = storageSet(SAVE_PREFIX + accountId, JSON.stringify(save))
+  if (!saved) return false
   const accounts = loadRegistry()
   const idx = accounts.findIndex((a) => a.id === accountId)
   if (idx >= 0) {
@@ -178,11 +204,11 @@ export function persistSave(accountId: string, save: SaveState) {
       xp: save.xp,
     })
   }
-  saveRegistry(accounts)
+  return saveRegistry(accounts)
 }
 
 export function deleteAccount(accountId: string) {
-  localStorage.removeItem(SAVE_PREFIX + accountId)
+  storageRemove(SAVE_PREFIX + accountId)
   const accounts = loadRegistry().filter((a) => a.id !== accountId)
   saveRegistry(accounts)
   if (getActiveId() === accountId) {
@@ -198,8 +224,8 @@ export function resetSave(accountId: string): SaveState {
     fresh.settings = current.settings
     fresh.tutorHistory = current.tutorHistory
     fresh.profile = { ...current.profile }
+    fresh.onboarded = true
   }
-  persistSave(accountId, fresh)
   return fresh
 }
 

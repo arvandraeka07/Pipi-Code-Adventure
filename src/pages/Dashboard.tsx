@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../store/GameContext'
 import { WORLDS } from '../data/worlds'
@@ -50,31 +51,31 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/daily">
-            <Chip icon="flame" className="border-coral/40 bg-[#FFF1EC] text-ink">
+            <Chip icon="flame" className="border-coral/40 bg-danger-soft text-ink">
               Streak {save.streak.count} hari
             </Chip>
           </Link>
           <Link to="/achievements">
-            <Chip icon="trophy" className="border-grapeDark/25 bg-[#F4EEFF] text-ink">
+            <Chip icon="trophy" className="border-grapeDark/25 bg-grape-soft text-ink">
               {unlockedBadges.length}/{BADGES.length} badge
             </Chip>
           </Link>
         </div>
       </div>
 
-      <Card tone="mint" className="relative overflow-hidden p-4 sm:p-5">
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/40" />
-        <div className="absolute -bottom-16 right-24 h-32 w-32 rounded-full bg-white/30" />
+      <Card tone="paper" className="relative overflow-hidden p-4 sm:p-5">
+        <div className="absolute inset-y-0 left-0 w-2 bg-leaf" aria-hidden="true" />
+        <div className="absolute right-3 top-3 stamp rotate-2 text-ink/30" aria-hidden="true">misi aktif</div>
         <div className="relative grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
           <div className="flex items-center justify-center">
-            <Pipi mood={save.streak.count > 0 ? 'happy' : 'hint'} stage={evolution} size={150} sparkle={level >= 6} />
+            <Pipi mood={save.streak.count > 0 ? 'happy' : 'hint'} stage={evolution} size={150} sparkle={level >= 6} interactive />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-sun px-2.5 py-1 font-display text-[11px] font-extrabold">
                 <Icon name="star" size={12} /> LEVEL {level}
               </span>
-              <span className="rounded-full border-2 border-ink/15 bg-white/70 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-ink/55">
+              <span className="rounded-full border-2 border-ink/15 bg-surface/70 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-ink/55">
                 {evolution === 'baby' ? 'Baby Pipi' : evolution === 'junior' ? 'Junior Pipi' : evolution === 'smart' ? 'Smart Pipi' : 'Python Master'}
               </span>
             </div>
@@ -102,7 +103,7 @@ export default function Dashboard() {
               </Link>
             </div>
             {nextEvo && (
-              <div className="mt-3 flex items-center gap-2 rounded-xl border-2 border-ink/10 bg-white/60 px-2.5 py-1.5 text-[10px] font-bold text-ink/55">
+              <div className="mt-3 flex items-center gap-2 rounded-xl border-2 border-ink/10 bg-surface/60 px-2.5 py-1.5 text-[10px] font-bold text-ink/55">
                 <Icon name="sparkles" size={13} className="text-grapeDark" />
                 Berikutnya: <span className="font-extrabold text-ink/80">{nextEvo.name}</span> — {nextEvo.progressText}
               </div>
@@ -133,7 +134,15 @@ export default function Dashboard() {
             />
             {next ? (
               <Card className="overflow-hidden">
-                <div className="relative p-4 sm:p-5" style={{ background: `linear-gradient(135deg, ${next.world.palette.soft}, #FFFEF8 70%)` }}>
+                <div
+                  className="world-tint relative p-4 sm:p-5"
+                  style={
+                    {
+                      '--tint-soft': next.world.palette.soft,
+                      '--tint-accent': next.world.palette.accent,
+                    } as CSSProperties
+                  }
+                >
                   <div className="flex flex-wrap items-start gap-3">
                     <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border-[3px] border-ink" style={{ backgroundColor: next.world.palette.accent }}>
                       <Icon name={next.world.icon} size={23} />
@@ -145,7 +154,7 @@ export default function Dashboard() {
                       <h3 className="font-display text-lg font-extrabold leading-tight text-ink">{next.level.title}</h3>
                       <p className="mt-0.5 text-xs font-semibold leading-snug text-ink/60">{next.level.summary}</p>
                     </div>
-                    <span className="rounded-full border-2 border-ink/15 bg-white/80 px-2 py-1 text-[10px] font-extrabold text-ink/55">
+                    <span className="rounded-full border-2 border-ink/15 bg-surface/80 px-2 py-1 text-[10px] font-extrabold text-ink/55">
                       {next.level.minutes} menit
                     </span>
                   </div>
@@ -153,10 +162,10 @@ export default function Dashboard() {
                     <Link to={`/lesson/${next.level.id}`}>
                       <Button size="sm" variant="primary" icon="play">Mulai Misi</Button>
                     </Link>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
                       <Icon name="bolt" size={12} className="text-sunDark" /> +{next.level.rewards.xp} XP
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-1 text-[10px] font-extrabold text-ink/55">
                       <Icon name="coin" size={12} className="text-sunDark" /> +{next.level.rewards.coins}
                     </span>
                   </div>
@@ -198,8 +207,8 @@ export default function Dashboard() {
                   <div
                     key={world.id}
                     className={cn(
-                      'flex items-center gap-3 rounded-2xl border-[3px] border-ink/10 bg-white/60 p-2.5 transition',
-                      p.unlocked ? 'hover:border-ink/25 hover:bg-white' : 'opacity-60',
+                      'flex items-center gap-3 rounded-2xl border-[3px] border-ink/10 bg-surface/60 p-2.5 transition',
+                      p.unlocked ? 'hover:border-ink/25 hover:bg-surface' : 'opacity-60',
                     )}
                   >
                     <Link to={p.unlocked ? `/world/${world.id}` : '/adventure'} className="flex min-w-0 flex-1 items-center gap-3">
@@ -250,7 +259,7 @@ export default function Dashboard() {
                   const done = current >= q.target
                   const claimed = Boolean(save.daily.claimed[q.id])
                   return (
-                    <div key={q.id} className={cn('flex items-center gap-2 rounded-xl border-2 px-2 py-1.5', claimed ? 'border-leaf/30 bg-leaf/5' : 'border-ink/10 bg-white/60')}>
+                    <div key={q.id} className={cn('flex items-center gap-2 rounded-xl border-2 px-2 py-1.5', claimed ? 'border-leaf/30 bg-leaf/5' : 'border-ink/10 bg-surface/60')}>
                       <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-lg border-2', claimed ? 'border-leaf bg-leaf text-white' : 'border-ink/15 bg-cream')}>
                         <Icon name={claimed ? 'check' : q.icon} size={13} />
                       </span>
@@ -275,7 +284,7 @@ export default function Dashboard() {
                   )
                 })}
               </div>
-              <Link to="/daily" className="mt-2 flex items-center justify-center gap-1 rounded-xl border-2 border-ink/10 bg-white/50 py-1.5 text-[10px] font-extrabold text-ink/50 hover:bg-white">
+              <Link to="/daily" className="mt-2 flex items-center justify-center gap-1 rounded-xl border-2 border-ink/10 bg-surface/50 py-1.5 text-[10px] font-extrabold text-ink/50 hover:bg-surface">
                 Lihat detail & streak <Icon name="arrow-right" size={12} />
               </Link>
             </Card>
@@ -287,14 +296,14 @@ export default function Dashboard() {
               {recentBadges.length ? (
                 <div className="grid grid-cols-4 gap-1.5">
                   {recentBadges.map((badge) => (
-                    <Link key={badge.id} to="/achievements" className="flex flex-col items-center gap-1 rounded-xl p-1 hover:bg-white/60" title={badge.name}>
+                    <Link key={badge.id} to="/achievements" className="flex flex-col items-center gap-1 rounded-xl p-1 hover:bg-surface/60" title={badge.name}>
                       <BadgeMedal badge={badge} unlocked size={52} />
                       <span className="line-clamp-1 text-center text-[9px] font-bold text-ink/55">{badge.name}</span>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-2 rounded-xl bg-white/50 p-2">
+                <div className="flex items-center gap-2 rounded-xl bg-surface/50 p-2">
                   <Icon name="trophy" size={20} className="text-ink/25" />
                   <p className="text-[10px] font-semibold leading-snug text-ink/50">
                     Belum ada badge. Selesaikan misi pertamamu untuk membuka koleksi.
@@ -310,7 +319,7 @@ export default function Dashboard() {
 
           <Card tone="grape" className="p-4">
             <div className="flex items-start gap-2.5">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-ink bg-white/70"><Icon name="chat" size={17} /></span>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-ink bg-surface/70"><Icon name="chat" size={17} /></span>
               <div>
                 <h3 className="font-display text-sm font-extrabold">Butuh bantuan?</h3>
                 <p className="mt-0.5 text-[11px] font-semibold leading-snug text-ink/60">
